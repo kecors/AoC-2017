@@ -1,6 +1,6 @@
 use std::io;
 
-fn summer(digits: &Vec<u32>) -> u32 {
+fn summer1(digits: &Vec<u32>) -> u32 {
     let mut sum = 0;
 
     // Proceed forward through the list of digits
@@ -18,6 +18,21 @@ fn summer(digits: &Vec<u32>) -> u32 {
     sum
 }
 
+fn summer2(digits: &Vec<u32>) -> u32 {
+    let mut sum = 0;
+
+    let half_len = digits.len() / 2;
+
+    // Proceed forward through the list of digits
+    for j in 0..half_len {
+        if digits[j] == digits[j+half_len] {
+            sum += digits[j];
+        }
+    }
+
+    sum + sum
+}
+
 fn parser(input: &String) -> Vec<u32> {
     // Convert input into vector of u32s; panic on invalid input
     let digits: Vec<u32> = input.trim().chars().map(|c| c.to_digit(10).unwrap()).collect();
@@ -30,14 +45,16 @@ fn main() {
 
     // Read stdin
     io::stdin().read_line(&mut input).unwrap();
+//    println!("input = {:?}", input);
 
     let digits = parser(&input);
-    let result = summer(&digits);
-
-//    println!("input = {:?}", input);
 //    println!("digits = {:?}", digits);
 
-    println!("result = {}", result);
+    let result_part_1 = summer1(&digits);
+    println!("result, part 1 = {}", result_part_1);
+
+    let result_part_2 = summer2(&digits);
+    println!("result, part 2 = {}", result_part_2);
 }
 
 #[cfg(test)]
@@ -45,16 +62,25 @@ mod tests {
     use super::*;
 
     #[test]
-    fn summer_provided_tests() {
-        assert_eq!(3, summer(&vec![1,1,2,2]));
-        assert_eq!(4, summer(&vec![1,1,1,1]));
-        assert_eq!(0, summer(&vec![1,2,3,4]));
-        assert_eq!(9, summer(&vec![9,1,2,1,2,1,2,9]));
+    fn summer1_provided_tests() {
+        assert_eq!(3, summer1(&vec![1,1,2,2]));
+        assert_eq!(4, summer1(&vec![1,1,1,1]));
+        assert_eq!(0, summer1(&vec![1,2,3,4]));
+        assert_eq!(9, summer1(&vec![9,1,2,1,2,1,2,9]));
     }
 
     #[test]
-    fn summer_other_tests() {
-        assert_eq!(23, summer(&vec![1,2,2,3,4,5,5,6,7,8,8,8,9,0]));
+    fn summer1_other_tests() {
+        assert_eq!(23, summer1(&vec![1,2,2,3,4,5,5,6,7,8,8,8,9,0]));
+    }
+
+    #[test]
+    fn summer2_provided_tests() {
+        assert_eq!(6, summer2(&vec![1,2,1,2]));
+        assert_eq!(0, summer2(&vec![1,2,2,1]));
+        assert_eq!(4, summer2(&vec![1,2,3,4,2,5]));
+        assert_eq!(12, summer2(&vec![1,2,3,1,2,3]));
+        assert_eq!(4, summer2(&vec![1,2,1,3,1,4,1,5]));
     }
 
     #[test]
