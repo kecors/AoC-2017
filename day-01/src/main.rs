@@ -34,8 +34,8 @@ fn main() {
     let digits = parser(&input);
     let result = summer(&digits);
 
-    println!("input = {:#?}", input);
-    println!("digits = {:#?}", digits);
+//    println!("input = {:?}", input);
+//    println!("digits = {:?}", digits);
 
     println!("result = {}", result);
 }
