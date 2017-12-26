@@ -1,6 +1,9 @@
 use std::io;
 
+#[derive(Copy)]
+#[derive(Clone)]
 #[derive(PartialEq)]
+#[derive(Debug)]
 enum Direction {
     RIGHT,
     UP,
@@ -8,45 +11,57 @@ enum Direction {
     DOWN
 }
 
-fn create_new_square(square: (i32,i32), direction: &Direction) -> (i32,i32) {
-    match direction {
-        &Direction::RIGHT => {
-            (square.0 + 1, square.1    )
-        },
-        &Direction::UP => {
-            (square.0    , square.1 + 1)
-        },
-        &Direction::LEFT => {
-            (square.0 - 1, square.1    )
-        },
-        &Direction::DOWN => {
-            (square.0    , square.1 - 1)
-        },
-    }
+#[derive(Clone)]
+#[derive(Debug)]
+struct Square {
+    x:         i32,
+    y:         i32,
+    direction: Direction,
+    sum:       u32
 }
 
-fn build_grid(grid: &mut Vec<(i32,i32)>, limit: usize) {
-    let mut square = (0,0);
-    let mut direction = Direction::RIGHT;
+fn create_next_square(square: &Square) -> Square {
+    let (x, y) : (i32, i32) = match square.direction {
+        Direction::RIGHT => {
+            (square.x + 1, square.y    )
+        },
+        Direction::UP => {
+            (square.x    , square.y + 1)
+        },
+        Direction::LEFT => {
+            (square.x - 1, square.y    )
+        },
+        Direction::DOWN => {
+            (square.x    , square.y - 1)
+        },
+    };
+
+    Square { x: x, y: y, direction: square.direction, sum: 0 }
+}
+
+fn build_grid(grid: &mut Vec<Square>, limit: usize) {
+    let mut square = Square { x: 0, y: 0, direction: Direction::RIGHT, sum: 0 };
     let mut distance = 1;
     let mut index: usize = 0;
     let mut step = 0;
 
     loop {
-        let new_square = create_new_square(square, &direction);
+        let next_square = create_next_square(&square);
 
         grid.push(square);
 
-        square = new_square;
+        square = next_square;
+
+        // Calcuate sum here
 
         step += 1;
         if step == distance {
             // Reset step, possibly increment distance, and change direction
             step = 0;
-            if direction == Direction::UP || direction == Direction::DOWN {
+            if square.direction == Direction::UP || square.direction == Direction::DOWN {
                 distance += 1;
             }
-            direction = match direction {
+            square.direction = match square.direction {
                 Direction::RIGHT => Direction::UP,
                 Direction::UP    => Direction::LEFT,
                 Direction::LEFT  => Direction::DOWN,
@@ -59,8 +74,8 @@ fn build_grid(grid: &mut Vec<(i32,i32)>, limit: usize) {
     }
 }
 
-fn calculate_steps(square: (i32,i32)) -> u32 {
-   (square.0.abs() + square.1.abs()) as u32
+fn calculate_steps(square: Square) -> u32 {
+   (square.x.abs() + square.y.abs()) as u32
 }
 
 fn main() {
@@ -70,9 +85,11 @@ fn main() {
 
     let limit: usize = input.trim().parse::<usize>().unwrap();
 
-    let mut grid: Vec<(i32,i32)> = Vec::with_capacity(limit as usize);
+    let mut grid: Vec<Square> = Vec::with_capacity(limit as usize);
 
     build_grid(&mut grid, limit);
 
-    println!("steps for {} = {}", limit, calculate_steps(grid[limit-1]));
+    let target_square = grid[limit-1].clone();
+//    println!("target_square = {:?}", target_square);
+    println!("steps for {} = {}", limit, calculate_steps(target_square));
 }
