@@ -74,7 +74,8 @@ fn build_grid(grid: &mut Vec<Square>, limit: usize) {
         step += 1;
         if step == distance {
             step = 0;
-            if square.direction == Direction::UP || square.direction == Direction::DOWN {
+            if square.direction == Direction::UP || 
+               square.direction == Direction::DOWN {
                 distance += 1;
             }
             square.turn();
