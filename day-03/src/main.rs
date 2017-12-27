@@ -5,7 +5,7 @@
 //     cat puzzle-input.txt | cargo run
 //
 // To run part 2:
-//     cat puzzle-input.txt | cargo run -- features part2
+//     cat puzzle-input.txt | cargo run --features part2
 //
 // Key Observations:
 //
