@@ -1,9 +1,26 @@
 //
+// Advent of Code 2017, Day 3
+//
 // To run part 1:
 //     cat puzzle-input.txt | cargo run
 //
 // To run part 2:
 //     cat puzzle-input.txt | cargo run -- features part2
+//
+// Key Observations:
+//
+// - The spiral is mapped on a two dimensional grid. Each square has an x
+//   and a y value, in relation to the origin at square 1.
+//
+// - The spiral builds starting as follows: 1 right, 1 up, 2 left, 2 down,
+//   3 right, 3 up, four left, 4 down... The code in Spiral::create_grid()
+//   marked "Turn the corner" continues this pattern.
+//
+// - The sum for a square can use 2, 3 or 4 previous values, depending on
+//   how soon the spiral will turn. Square::summable_squares() builds a 
+//   list of these adjacent values. Spiral::calculate_sum() searches 
+//   backward through the grid vector, matching on grid position and adding
+//   up the new sum.
 //
 use std::io;
 
