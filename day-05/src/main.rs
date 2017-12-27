@@ -1,6 +1,28 @@
+//
+// To run part 1:
+//     cat puzzle-input.txt | cargo run
+//
+// To run part 2:
+//     cat puzzle-input.txt | cargo run --features part2
+//
+
 use std::io::{stdin, Read};
 
-fn jump_through_maze(instructions: &mut Vec<i32>) -> u32 {
+#[cfg(feature="part2")]
+fn modify_instruction(instructions: &mut Vec<i32>, index: usize, instruction: i32) {
+    if instruction >= 3 {
+        instructions[index] -= 1;
+    } else {
+        instructions[index] += 1;
+    }
+}
+
+#[cfg(not(feature="part2"))]
+fn modify_instruction(instructions: &mut Vec<i32>, index: usize, _instruction: i32) {
+    instructions[index] += 1;
+}
+
+fn jump_through_maze(mut instructions: &mut Vec<i32>) -> u32 {
     let mut instruction: i32;
     let mut index: usize = 0;
     let mut new_index: i32;
@@ -17,7 +39,7 @@ fn jump_through_maze(instructions: &mut Vec<i32>) -> u32 {
             break;
         }
 
-        instructions[index] += 1;
+        modify_instruction(&mut instructions, index, instruction);
 
         index = new_index as usize;
     }
