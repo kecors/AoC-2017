@@ -1,3 +1,10 @@
+//
+// To run part 1:
+//     cat puzzle-input.txt | cargo run
+//
+// To run part 2:
+//     cat puzzle-input.txt | cargo run -- features part2
+//
 use std::io;
 
 #[derive(Copy)]
@@ -43,6 +50,7 @@ impl Square {
         Square { x: x, y: y, direction: self.direction, sum: None }
     }
 
+    #[cfg(feature="part2")]
     fn summable_squares(&self, position: u32) -> Vec<(i32,i32)> {
         let mut result : Vec<(i32,i32)> = Vec::new();
 
@@ -113,24 +121,54 @@ impl Square {
     }
 }
 
-fn build_grid(grid: &mut Vec<Square>, limit: usize) {
-    let mut square = Square::initial();
-    let mut distance = 1;
-    let mut step = 0;
+struct Spiral {
+    limit:    usize,
+    grid:     Vec<Square>,
+    distance: u32,
+    step:     u32
+}
 
-    loop {
-        let next_square = square.create_next();
+impl Spiral {
+    fn new(limit: usize) -> Spiral {
+        Spiral {
+            limit:    limit,
+            grid:     Vec::with_capacity(limit),
+            distance: 1,
+            step:     0
+        }
+    }
 
-        grid.push(square);
+    fn build_grid(&mut self) {
+        let mut square = Square::initial();
+        loop {
+            let next_square = square.create_next();
+            self.grid.push(square);
 
-        square = next_square;
-        step += 1;
+            square = next_square;
+            self.step += 1;
 
-        // Calcuate sum here
-        let summable_squares = square.summable_squares(distance - step);
+            self.calculate_sum(&mut square);
+
+            // Turn the corner
+            if self.step == self.distance {
+                self.step = 0;
+                if square.direction == Direction::UP || 
+                   square.direction == Direction::DOWN {
+                    self.distance += 1;
+                }
+                square.turn();
+             }
+
+             if self.grid.len() == self.limit { break; }
+        }
+    }
+
+    #[cfg(feature="part2")]
+    fn calculate_sum(&self, square: &mut Square) {
+        let summable_squares = square.summable_squares(self.distance - self.step);
         let mut sum = 0;
         for ss in summable_squares {
-            for q in grid.iter().rev() {
+            for q in self.grid.iter().rev() {
                 if ss.0 == q.x && ss.1 == q.y {
                     sum += q.sum.unwrap();
                     break;
@@ -138,24 +176,19 @@ fn build_grid(grid: &mut Vec<Square>, limit: usize) {
             }
         }
         square.sum = Some(sum);
-
-        // This code is wanted for part 2, but not for part 1
-        if sum > (limit as u32) {
-            println!("sum = {}", sum);
+        if sum > (self.limit as u32) {
+            println!("limit {}: part 2 - sum = {}", self.limit, sum);
             std::process::exit(0);
         }
+    }
 
-        // Turn the corner
-        if step == distance {
-            step = 0;
-            if square.direction == Direction::UP || 
-               square.direction == Direction::DOWN {
-                distance += 1;
-            }
-            square.turn();
-        }
+    #[cfg(not(feature="part2"))]
+    fn calculate_sum(&self, _square: &mut Square) {
+    }
 
-        if grid.len() == limit { break; }
+    fn print_part_1_result(&self) {
+        println!("limit {}: part 1 - steps = {}", 
+                 self.limit, self.grid[self.limit-1].calculate_steps());
     }
 }
 
@@ -166,9 +199,7 @@ fn main() {
 
     let limit: usize = input.trim().parse::<usize>().unwrap();
 
-    let mut grid: Vec<Square> = Vec::with_capacity(limit);
-
-    build_grid(&mut grid, limit);
-
-    println!("limit {}: steps = {}", limit, grid[limit-1].calculate_steps());
+    let mut spiral = Spiral::new(limit);
+    spiral.build_grid();
+    spiral.print_part_1_result();
 }
