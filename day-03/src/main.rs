@@ -16,7 +16,7 @@ struct Square {
     x:         i32,
     y:         i32,
     direction: Direction,
-    sum:       Option<u64>
+    sum:       Option<u32>
 }
 
 impl Square {
@@ -127,19 +127,20 @@ fn build_grid(grid: &mut Vec<Square>, limit: usize) {
         step += 1;
 
         // Calcuate sum here
-        let ss = square.summable_squares(distance - step);
+        let summable_squares = square.summable_squares(distance - step);
         let mut sum = 0;
-//        println!("ss = {:?}", ss);
-        for f in grid.iter().rev() {
-            for g in ss.clone() {
-                if f.x == g.0 && f.y == g.1 {
-//                    println!("f = {:?}", f);
-                    sum += f.sum.unwrap();
+        for ss in summable_squares {
+            for q in grid.iter().rev() {
+                if ss.0 == q.x && ss.1 == q.y {
+                    sum += q.sum.unwrap();
+                    break;
                 }
             }
         }
         square.sum = Some(sum);
-        if sum > (limit as u64) {
+
+        // This code is wanted for part 2, but not for part 1
+        if sum > (limit as u32) {
             println!("sum = {}", sum);
             std::process::exit(0);
         }
