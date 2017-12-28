@@ -3,22 +3,22 @@ use std::collections::HashMap;
 use std::collections::hash_map::Entry;
 
 struct State {
-    hm: HashMap<Vec<u32>, bool>
+    hm: HashMap<Vec<u32>, u32>
 }
 
 impl State {
     fn new() -> State {
         State {
-            hm: HashMap::<Vec<u32>, bool>::new()
+            hm: HashMap::<Vec<u32>, u32>::new()
         }
     }
 
-    fn track(&mut self, banks: &Vec<u32>) -> bool {
+    fn track(&mut self, banks: &Vec<u32>, cycle: u32) -> Option<u32> {
         match self.hm.entry((*banks).to_vec()) {
-            Entry::Occupied(_) => return true,
-            Entry::Vacant(v)   => v.insert(true)
+            Entry::Occupied(o) => return Some(*o.get()),
+            Entry::Vacant(v)   => v.insert(cycle)
         };
-        false
+        None
     }
 }
 
@@ -58,8 +58,9 @@ fn process(mut banks: Vec<u32>) {
     let mut cycles: u32 = 0;
 
     loop {
-        if state.track(&banks) == true {
+        if let Some(loop_start) = state.track(&banks, cycles) {
             println!("Configuration repeated after {} cycles", cycles);
+            println!("Infinite loop of {} cycles", cycles - loop_start);
             return;
         }
         let index = find_largest_bank(&banks);
