@@ -1,0 +1,6 @@
+[package]
+name = "day-07"
+version = "0.1.0"
+authors = ["Kenneth Collins <dev@kecors.net>"]
+
+[dependencies]
