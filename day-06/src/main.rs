@@ -13,7 +13,7 @@ impl State {
         }
     }
 
-    fn track(&mut self, banks: &Vec<u32>, cycle: u32) -> Option<u32> {
+    fn track(&mut self, banks: &[u32], cycle: u32) -> Option<u32> {
         match self.hm.entry((*banks).to_vec()) {
             Entry::Occupied(o) => return Some(*o.get()),
             Entry::Vacant(v)   => v.insert(cycle)
@@ -22,7 +22,7 @@ impl State {
     }
 }
 
-fn find_largest_bank(banks: &Vec<u32>) -> usize {
+fn find_largest_bank(banks: &[u32]) -> usize {
     let mut largest_bank: u32 = 0;
     let mut index_result: usize = 0;
 

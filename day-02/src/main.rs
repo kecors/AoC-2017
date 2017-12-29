@@ -16,7 +16,7 @@ fn process_row_part_2(row: &Vec<u32>) -> u32 {
     let mut result = 0;
 
     for x in row {
-        let row_clone = row.clone();
+        let row_clone = row.to_owned();
         for y in row_clone {
             if *x == y { continue; }
             if *x % y == 0 { result = *x / y; break; }
@@ -26,12 +26,12 @@ fn process_row_part_2(row: &Vec<u32>) -> u32 {
     result
 }
 
-fn process_rows<F>(rows: &Vec<Vec<u32>>, f: F) -> u32
+fn process_rows<F>(rows: &[Vec<u32>], f: F) -> u32
     where F: Fn(&Vec<u32>) -> u32 {
     let mut sum: u32 = 0;
 
     for row in rows {
-        sum += f(&row);
+        sum += f(row);
     }
 
     sum

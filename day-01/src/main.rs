@@ -1,6 +1,6 @@
 use std::io;
 
-fn summer1(digits: &Vec<u32>) -> u32 {
+fn summer1(digits: &[u32]) -> u32 {
     let mut sum = 0;
 
     // Proceed forward through the list of digits
@@ -18,7 +18,7 @@ fn summer1(digits: &Vec<u32>) -> u32 {
     sum
 }
 
-fn summer2(digits: &Vec<u32>) -> u32 {
+fn summer2(digits: &[u32]) -> u32 {
     let mut sum = 0;
 
     let half_len = digits.len() / 2;
@@ -33,7 +33,7 @@ fn summer2(digits: &Vec<u32>) -> u32 {
     sum + sum
 }
 
-fn parser(input: &String) -> Vec<u32> {
+fn parser(input: &str) -> Vec<u32> {
     // Convert input into vector of u32s; panic on invalid input
     let digits: Vec<u32> = input.trim().chars().map(|c| c.to_digit(10).unwrap()).collect();
 
