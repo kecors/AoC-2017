@@ -1,0 +1,10 @@
+alpha = { 'a'..'z' }
+digit = { '0'..'9' }
+
+name = { (alpha)+ }
+weight = { (digit)+ }
+heldprogram = { (alpha)+ }
+
+disc = _{ " -> " ~ heldprogram ~ (", " ~ heldprogram)* }
+
+line = _{ name ~ " (" ~ weight ~ ")" ~ disc? }
