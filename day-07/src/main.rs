@@ -15,7 +15,7 @@ struct ProgramParser;
 struct Program {
     name: String,
     weight: u32,
-    disc: Vec<String>   // May want to wrap in Option
+    disc: Vec<String>
 }
 
 fn parse_line(line: &str) -> Program {
@@ -44,26 +44,20 @@ fn parse_line(line: &str) -> Program {
     }
 }
 
-fn collect_names(programs: &Vec<Program>) -> HashSet<String> {
-    let mut hs = HashSet::new();
-
+fn find_bottom(programs: &Vec<Program>) -> String {
+    let mut programs_hs = HashSet::new();
     for program in programs {
-        hs.insert(program.name.clone());
+        programs_hs.insert(program.name.clone());
     }
 
-    hs
-}
-
-fn collect_heldprograms(programs: &Vec<Program>) -> HashSet<String> {
-    let mut hs = HashSet::new();
-
+    let mut heldprograms_hs = HashSet::new();
     for program in programs {
         for heldprogram in program.disc.clone() {
-            hs.insert(heldprogram);
+            heldprograms_hs.insert(heldprogram);
         }
     }
 
-    hs
+    programs_hs.difference(&heldprograms_hs).last().unwrap().clone()
 }
 
 fn main() {
@@ -77,13 +71,6 @@ fn main() {
                                       .collect();
 //    println!("programs = {:?}", programs);
 
-    let names = collect_names(&programs);
-//    println!("name = {:?}", names);
-
-    let heldprograms = collect_heldprograms(&programs);
-//    println!("heldprograms = {:?}", heldprograms);
-
-    for bottom in names.difference(&heldprograms) {
-        println!("bottom = {:?}", bottom);
-    }
+    let bottom = find_bottom(&programs);
+    println!("bottom = {}", bottom);
 }
