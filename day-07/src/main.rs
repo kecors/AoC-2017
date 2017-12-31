@@ -1,7 +1,5 @@
 use std::io::{stdin, Read};
 use std::collections::{HashSet, HashMap};
-use std::rc::Rc;
-use std::cell::RefCell;
 
 extern crate pest;
 #[macro_use]
@@ -64,8 +62,7 @@ fn find_bottom(programs: &Vec<Program>) -> String {
     programs_hs.difference(&heldprograms_hs).last().unwrap().clone()
 }
 
-// Perhaps don't need Rc<RefCell<>>? Just if let?
-fn calculate_disc_weights(hm: &mut Rc<RefCell<HashMap<String, Program>>>, bottom: String) {
+fn calculate_disc_weights(hm: &mut HashMap<String, Program>, bottom: String) {
     let mut stack: Vec<String> = Vec::new();
 
     stack.push(bottom);
@@ -78,7 +75,7 @@ fn calculate_disc_weights(hm: &mut Rc<RefCell<HashMap<String, Program>>>, bottom
 //        println!("name = {}", name);
 
         let mut program = Program::default();
-        if let Some(q) = hm.borrow().get(&name) {
+        if let Some(q) = hm.get(&name) {
 //            println!("q = {:?}", q);
             program.name = q.name.clone();
             program.weight = q.weight;
@@ -87,7 +84,7 @@ fn calculate_disc_weights(hm: &mut Rc<RefCell<HashMap<String, Program>>>, bottom
 //        println!("program = {:?}", program);
 
         if program.disc.len() == 0 {
-            if let Some(p) = hm.borrow_mut().get_mut(&name) {
+            if let Some(p) = hm.get_mut(&name) {
                 p.disc_weight = Some(0);
                 continue;
             }
@@ -95,7 +92,7 @@ fn calculate_disc_weights(hm: &mut Rc<RefCell<HashMap<String, Program>>>, bottom
 
         let mut needs_calculation = Vec::new();
         for subname in program.disc.clone() {
-            if let Some(subprogram) = hm.borrow().get(&subname) {
+            if let Some(subprogram) = hm.get(&subname) {
                 if subprogram.disc_weight == None {
                     needs_calculation.push(subname);
                 }
@@ -111,14 +108,14 @@ fn calculate_disc_weights(hm: &mut Rc<RefCell<HashMap<String, Program>>>, bottom
 
         let mut disc_weight = program.weight;
         for subname in program.disc.clone() {
-            if let Some(subprogram) = hm.borrow().get(&subname) {
+            if let Some(subprogram) = hm.get(&subname) {
                 disc_weight += subprogram.weight;
                 if let Some(subweight) = subprogram.disc_weight {
                     disc_weight += subweight;
                 }
             }
         }
-        if let Some(p) = hm.borrow_mut().get_mut(&name) {
+        if let Some(p) = hm.get_mut(&name) {
             p.disc_weight = Some(disc_weight);
         }
     }
@@ -138,9 +135,9 @@ fn main() {
     let bottom = find_bottom(&programs);
     println!("bottom = {}", bottom);
 
-    let mut k: Rc<RefCell<HashMap<String, Program>>> = Rc::new(RefCell::new(HashMap::new()));
+    let mut k: HashMap<String, Program> = HashMap::new();
     for program in programs {
-        k.borrow_mut().insert(program.name.clone(), program);
+        k.insert(program.name.clone(), program);
     }
     println!("k = {:?}", k);
     calculate_disc_weights(&mut k, bottom);
