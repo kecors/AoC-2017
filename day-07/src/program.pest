@@ -3,8 +3,8 @@ digit = { '0'..'9' }
 
 name = { (alpha)+ }
 weight = { (digit)+ }
-heldprogram = { (alpha)+ }
+subprogram = { (alpha)+ }
 
-disc = _{ " -> " ~ heldprogram ~ (", " ~ heldprogram)* }
+disc = _{ " -> " ~ subprogram ~ (", " ~ subprogram)* }
 
 line = _{ name ~ " (" ~ weight ~ ")" ~ disc? }

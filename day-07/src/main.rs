@@ -20,11 +20,7 @@ struct Program {
 }
 
 fn parse_line(line: &str) -> Program {
-//    println!("line = {:?}", line);
-
-    let mut name: String = "unspecified".to_string();
-    let mut weight: u32 = 0;
-    let mut disc: Vec<String> = Vec::new();
+    let mut program = Program::default();
 
     let pairs = ProgramParser::parse_str(Rule::line, line).unwrap_or_else(|e| panic!("{}", e));
 
@@ -32,18 +28,14 @@ fn parse_line(line: &str) -> Program {
         let rule = pair.as_rule();
         let text = pair.clone().into_span().as_str().to_string();
         match rule {
-            Rule::name        => { name = text; },
-            Rule::weight      => { weight = text.parse::<u32>().unwrap(); },
-            Rule::heldprogram => { disc.push(text); },
-            _                 => { println!("unknown rule {:?}", rule); }
+            Rule::name       => { program.name = text; },
+            Rule::weight     => { program.weight = text.parse().unwrap(); },
+            Rule::subprogram => { program.disc.push(text); },
+            _                => { println!("unknown rule {:?}", rule); }
         }
     }
-    Program {
-        name: name,
-        weight: weight,
-        disc: disc,
-        disc_weight: None
-    }
+
+    program
 }
 
 fn find_bottom(programs: &Vec<Program>) -> String {
@@ -52,14 +44,14 @@ fn find_bottom(programs: &Vec<Program>) -> String {
         programs_hs.insert(program.name.clone());
     }
 
-    let mut heldprograms_hs = HashSet::new();
+    let mut subprograms_hs = HashSet::new();
     for program in programs {
-        for heldprogram in program.disc.clone() {
-            heldprograms_hs.insert(heldprogram);
+        for subprogram in program.disc.clone() {
+            subprograms_hs.insert(subprogram);
         }
     }
 
-    programs_hs.difference(&heldprograms_hs).last().unwrap().clone()
+    programs_hs.difference(&subprograms_hs).last().unwrap().clone()
 }
 
 fn calculate_disc_weights(hm: &mut HashMap<String, Program>, bottom: String) {
@@ -72,16 +64,13 @@ fn calculate_disc_weights(hm: &mut HashMap<String, Program>, bottom: String) {
             break;
         }
         let name = stack.pop().unwrap();
-//        println!("name = {}", name);
 
         let mut program = Program::default();
-        if let Some(q) = hm.get(&name) {
-//            println!("q = {:?}", q);
-            program.name = q.name.clone();
-            program.weight = q.weight;
-            program.disc = q.disc.clone();
+        if let Some(p) = hm.get(&name) {
+            program.name = p.name.clone();
+            program.weight = p.weight;
+            program.disc = p.disc.clone();
         }
-//        println!("program = {:?}", program);
 
         if program.disc.len() == 0 {
             if let Some(p) = hm.get_mut(&name) {
@@ -133,14 +122,14 @@ fn main() {
 //    println!("programs = {:?}", programs);
 
     let bottom = find_bottom(&programs);
-    println!("bottom = {}", bottom);
+//    println!("bottom = {}", bottom);
 
-    let mut k: HashMap<String, Program> = HashMap::new();
+    let mut hm: HashMap<String, Program> = HashMap::new();
     for program in programs {
-        k.insert(program.name.clone(), program);
+        hm.insert(program.name.clone(), program);
     }
-    println!("k = {:?}", k);
-    calculate_disc_weights(&mut k, bottom);
+    println!("hm = {:?}", hm);
+    calculate_disc_weights(&mut hm, bottom);
     println!("");
-    println!("k = {:?}", k);
+    println!("hm = {:?}", hm);
 }
