@@ -64,6 +64,7 @@ fn find_bottom(programs: &Vec<Program>) -> String {
     programs_hs.difference(&heldprograms_hs).last().unwrap().clone()
 }
 
+// Perhaps don't need Rc<RefCell<>>? Just if let?
 fn calculate_disc_weights(hm: &mut Rc<RefCell<HashMap<String, Program>>>, bottom: String) {
     let mut stack: Vec<String> = Vec::new();
 
@@ -74,7 +75,7 @@ fn calculate_disc_weights(hm: &mut Rc<RefCell<HashMap<String, Program>>>, bottom
             break;
         }
         let name = stack.pop().unwrap();
-        println!("name = {}", name);
+//        println!("name = {}", name);
 
         let mut program = Program::default();
         if let Some(q) = hm.borrow().get(&name) {
@@ -91,7 +92,6 @@ fn calculate_disc_weights(hm: &mut Rc<RefCell<HashMap<String, Program>>>, bottom
                 continue;
             }
         }
-        println!("stop 1");
 
         let mut needs_calculation = Vec::new();
         for subname in program.disc.clone() {
@@ -102,7 +102,6 @@ fn calculate_disc_weights(hm: &mut Rc<RefCell<HashMap<String, Program>>>, bottom
             }
         }
         if needs_calculation.len() > 0 {
-            println!("stop 2");
             stack.push(name);
             for subname in needs_calculation {
                 stack.push(subname);
