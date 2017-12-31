@@ -96,7 +96,7 @@ fn calculate_disc_weights(hm: &mut HashMap<String, Program>, bottom: String) {
             continue;
         }
 
-        let mut disc_weight = program.weight;
+        let mut disc_weight = 0;
         for subname in program.disc.clone() {
             if let Some(subprogram) = hm.get(&subname) {
                 disc_weight += subprogram.weight;
