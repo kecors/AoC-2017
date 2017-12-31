@@ -1,5 +1,7 @@
 use std::io::{stdin, Read};
-use std::collections::HashSet;
+use std::collections::{HashSet, HashMap};
+use std::rc::Rc;
+use std::cell::RefCell;
 
 extern crate pest;
 #[macro_use]
@@ -11,11 +13,12 @@ use pest::Parser;
 #[grammar = "program.pest"]
 struct ProgramParser;
 
-#[derive(Debug)]
+#[derive(Debug, Default)]
 struct Program {
     name: String,
     weight: u32,
-    disc: Vec<String>
+    disc: Vec<String>,
+    disc_weight: Option<u32>
 }
 
 fn parse_line(line: &str) -> Program {
@@ -40,7 +43,8 @@ fn parse_line(line: &str) -> Program {
     Program {
         name: name,
         weight: weight,
-        disc: disc
+        disc: disc,
+        disc_weight: None
     }
 }
 
@@ -60,6 +64,67 @@ fn find_bottom(programs: &Vec<Program>) -> String {
     programs_hs.difference(&heldprograms_hs).last().unwrap().clone()
 }
 
+fn calculate_disc_weights(hm: &mut Rc<RefCell<HashMap<String, Program>>>, bottom: String) {
+    let mut stack: Vec<String> = Vec::new();
+
+    stack.push(bottom);
+
+    loop {
+        if stack.len() == 0 {
+            break;
+        }
+        let name = stack.pop().unwrap();
+        println!("name = {}", name);
+
+        let mut program = Program::default();
+        if let Some(q) = hm.borrow().get(&name) {
+//            println!("q = {:?}", q);
+            program.name = q.name.clone();
+            program.weight = q.weight;
+            program.disc = q.disc.clone();
+        }
+//        println!("program = {:?}", program);
+
+        if program.disc.len() == 0 {
+            if let Some(p) = hm.borrow_mut().get_mut(&name) {
+                p.disc_weight = Some(0);
+                continue;
+            }
+        }
+        println!("stop 1");
+
+        let mut needs_calculation = Vec::new();
+        for subname in program.disc.clone() {
+            if let Some(subprogram) = hm.borrow().get(&subname) {
+                if subprogram.disc_weight == None {
+                    needs_calculation.push(subname);
+                }
+            }
+        }
+        if needs_calculation.len() > 0 {
+            println!("stop 2");
+            stack.push(name);
+            for subname in needs_calculation {
+                stack.push(subname);
+            }
+            continue;
+        }
+
+        let mut disc_weight = program.weight;
+        for subname in program.disc.clone() {
+            if let Some(subprogram) = hm.borrow().get(&subname) {
+                disc_weight += subprogram.weight;
+                if let Some(subweight) = subprogram.disc_weight {
+                    disc_weight += subweight;
+                }
+            }
+        }
+        if let Some(p) = hm.borrow_mut().get_mut(&name) {
+            p.disc_weight = Some(disc_weight);
+        }
+    }
+}
+
 fn main() {
     let mut input = String::new();
 
@@ -73,4 +138,13 @@ fn main() {
 
     let bottom = find_bottom(&programs);
     println!("bottom = {}", bottom);
+
+    let mut k: Rc<RefCell<HashMap<String, Program>>> = Rc::new(RefCell::new(HashMap::new()));
+    for program in programs {
+        k.borrow_mut().insert(program.name.clone(), program);
+    }
+    println!("k = {:?}", k);
+    calculate_disc_weights(&mut k, bottom);
+    println!("");
+    println!("k = {:?}", k);
 }
