@@ -63,6 +63,7 @@ fn calculate_disc_weights(hm: &mut HashMap<String, Program>, bottom: String) {
         if stack.len() == 0 {
             break;
         }
+
         let name = stack.pop().unwrap();
 
         let mut program = Program::default();
@@ -110,6 +111,48 @@ fn calculate_disc_weights(hm: &mut HashMap<String, Program>, bottom: String) {
     }
 }
 
+fn display_tower(hm: &HashMap<String, Program>, bottom: String) {
+    let mut stack: Vec<(String, u32)> = Vec::new();
+
+    stack.push((bottom, 0));
+
+    loop {
+        if stack.len() == 0 {
+            break;
+        }
+
+        let (name, depth) = stack.pop().unwrap();
+
+        let mut program = Program::default();
+        if let Some(p) = hm.get(&name) {
+            program.name = p.name.clone();
+            program.weight = p.weight;
+            program.disc = p.disc.clone();
+            program.disc_weight = p.disc_weight;
+        }
+
+        for _ in 0..depth {
+            program.name.insert(0, '-');
+        }
+        print!("{:12} ({:6}) [{:6}]", program.name, 
+                                      program.weight, 
+                                      program.disc_weight.unwrap());
+
+        for subprogram in program.disc.clone() {
+            print!(" {}", subprogram);
+        }
+        println!("");
+
+        program.disc.reverse();
+        for subprogram in program.disc {
+            stack.push((subprogram, depth+1));
+        }
+    }
+}
+
+fn find_imbalance(hm: &HashMap<String, Program>, bottom: String) {
+}
+
 fn main() {
     let mut input = String::new();
 
@@ -128,8 +171,9 @@ fn main() {
     for program in programs {
         hm.insert(program.name.clone(), program);
     }
-    println!("hm = {:?}", hm);
-    calculate_disc_weights(&mut hm, bottom);
-    println!("");
-    println!("hm = {:?}", hm);
+//    println!("hm = {:?}", hm);
+    calculate_disc_weights(&mut hm, bottom.clone());
+//    println!("");
+//    println!("hm = {:?}", hm);
+    display_tower(&hm, bottom.clone());
 }
