@@ -163,7 +163,6 @@ impl Tower {
 
     fn find_imbalance(&self) {
         let mut stack = Vec::new();
-        let mut ancestry = Vec::new();
         let mut standards = Vec::new();
 
         stack.push(self.bottom.clone());
@@ -175,8 +174,6 @@ impl Tower {
 
             let name = stack.pop().unwrap();
 
-            ancestry.push(name.clone());
-
             let mut program = Program::default();
             if let Some(p) = self.programs_hm.get(&name) {
                 program.name = p.name.clone();
@@ -185,47 +182,38 @@ impl Tower {
                 program.disc_weight = p.disc_weight;
             };
 
-            let mut es: HashMap<u32, Vec<String>> = HashMap::new();
+            let mut weights_hm: HashMap<u32, Vec<String>> = HashMap::new();
             for subprogram in program.disc {
                 if let Some(p) = self.programs_hm.get(&subprogram) {
-                    match es.entry(p.total_weight()) {
-                        Entry::Vacant(v)   => { 
-                            println!("v = {:?}", v);
-                            let mut a = Vec::new();
-                            a.push(p.name.clone());
-                            v.insert(a); 
+                    match weights_hm.entry(p.total_weight()) {
+                        Entry::Vacant(vacant)   => { 
+                            let mut subprograms = Vec::new();
+                            subprograms.push(p.name.clone());
+                            vacant.insert(subprograms); 
                         },
-                        Entry::Occupied(mut o) => {
-                            println!("o = {:?}", o);
-                            o.get_mut().push(p.name.clone());
+                        Entry::Occupied(mut occupied) => {
+                            occupied.get_mut().push(p.name.clone());
                         }
                     };
                 }
             }
-            println!("es = {:?}", es);
-            println!("es.len() = {}", es.len());
-            if es.len() == 1 {
-                println!("ancestry = {:?}", ancestry);
-                println!("standards = {:?}", standards);
-                for (k,v) in es {
-                    let result = standards.pop().unwrap() - (k * v.len() as u32);
-                    println!("result = {}", result);
+            println!("{} -> {:?}", name, weights_hm);
+            if weights_hm.len() == 1 {
+                for (k,v) in weights_hm {
+                    let standard = standards.pop().unwrap();
+                    let result = standard - (k * v.len() as u32);
+                    println!("result: {} - ({} * {}) = {}",
+                        standard, k, v.len(), result);
                 }
                 break;
             }
-            let mut standard: u32 = 0;
-            let mut deviant: u32 = 0;
-            for (k,v) in es {
+            for (k,v) in weights_hm {
                 if v.len() == 1 {
-                    println!("v = {:?}", v);
                     stack.push(v[0].clone());
-                    deviant = k;
                 } else {
-                    standard = k;
+                    standards.push(k);
                 }
             }
-            println!("standard = {}, deviant = {}", standard, deviant);
-            standards.push(standard);
         }
     }
 }
@@ -253,21 +241,13 @@ fn main() {
     let mut input = String::new();
 
     stdin().read_to_string(&mut input).unwrap();
-//    println!("input = {:#?}", input);
 
     let programs: Vec<Program> = input.lines()
                                       .map(|line| parse_line(line))
                                       .collect();
-//    println!("programs = {:?}", programs);
 
     let mut tower = Tower::new(programs);
     tower.calculate_disc_weights();
     tower.display();
     tower.find_imbalance();
-//    println!("hm = {:?}", hm);
-//    calculate_disc_weights(&mut tower.programs_hm, tower.bottom.clone());
-//    println!("");
-//    println!("hm = {:?}", hm);
-//    display_tower(&tower.programs_hm, tower.bottom.clone());
-//    find_imbalance(&tower.programs_hm, tower.bottom.clone());
 }
