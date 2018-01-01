@@ -55,7 +55,8 @@ struct Instruction {
 
 #[derive(Debug)]
 struct State {
-    registers: HashMap<String, i32>
+    registers: HashMap<String, i32>,
+    max_held: i32
 }
 
 impl State {
@@ -67,7 +68,8 @@ impl State {
         }
 
         State {
-            registers: registers
+            registers: registers,
+            max_held: 0
         }
     }
 
@@ -92,12 +94,16 @@ impl State {
                 BinOp::INCREMENT => { *regval += instr.operand; },
                 BinOp::DECREMENT => { *regval -= instr.operand; }
             }
+            if *regval > self.max_held {
+                self.max_held = *regval;
+            }
         }
     }
 
-    fn report_max_value(&self) {
+    fn report_maxes(&self) {
         let values: Vec<&i32> = self.registers.values().collect();
         println!("maximum value = {}", values.iter().max().unwrap());
+        println!("max held = {}", self.max_held);
     }
 }
 
@@ -148,5 +154,5 @@ fn main() {
 //        println!("state = {:?}", state);
     }
 
-    state.report_max_value();
+    state.report_maxes();
 }
