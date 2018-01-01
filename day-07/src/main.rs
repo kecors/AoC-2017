@@ -163,6 +163,7 @@ fn display_tower(hm: &HashMap<String, Program>, bottom: String) {
 fn find_imbalance(hm: &HashMap<String, Program>, bottom: String) {
     let mut stack = Vec::new();
     let mut ancestry = Vec::new();
+    let mut standards = Vec::new();
 
     stack.push(bottom);
 
@@ -204,6 +205,11 @@ fn find_imbalance(hm: &HashMap<String, Program>, bottom: String) {
         println!("es.len() = {}", es.len());
         if es.len() == 1 {
             println!("ancestry = {:?}", ancestry);
+            println!("standards = {:?}", standards);
+            for (k,v) in es {
+                let result = standards.pop().unwrap() - (k * v.len() as u32);
+                println!("result = {}", result);
+            }
             break;
         }
         let mut standard: u32 = 0;
@@ -218,6 +224,7 @@ fn find_imbalance(hm: &HashMap<String, Program>, bottom: String) {
             }
         }
         println!("standard = {}, deviant = {}", standard, deviant);
+        standards.push(standard);
     }
 }
 
