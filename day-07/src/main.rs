@@ -1,5 +1,6 @@
 use std::io::{stdin, Read};
 use std::collections::{HashSet, HashMap};
+use std::collections::hash_map::Entry;
 
 extern crate pest;
 #[macro_use]
@@ -17,6 +18,15 @@ struct Program {
     weight: u32,
     disc: Vec<String>,
     disc_weight: Option<u32>
+}
+
+impl Program {
+    fn total_weight(&self) -> u32 {
+        self.weight + match self.disc_weight {
+            Some(w) => w,
+            None    => 0
+        }
+    }
 }
 
 fn parse_line(line: &str) -> Program {
@@ -151,6 +161,64 @@ fn display_tower(hm: &HashMap<String, Program>, bottom: String) {
 }
 
 fn find_imbalance(hm: &HashMap<String, Program>, bottom: String) {
+    let mut stack = Vec::new();
+    let mut ancestry = Vec::new();
+
+    stack.push(bottom);
+
+    loop {
+        if stack.len() == 0 {
+            break;
+        }
+
+        let name = stack.pop().unwrap();
+
+        ancestry.push(name.clone());
+
+        let mut program = Program::default();
+        if let Some(p) = hm.get(&name) {
+            program.name = p.name.clone();
+            program.weight = p.weight;
+            program.disc = p.disc.clone();
+            program.disc_weight = p.disc_weight;
+        };
+
+        let mut es: HashMap<u32, Vec<String>> = HashMap::new();
+        for subprogram in program.disc {
+            if let Some(p) = hm.get(&subprogram) {
+                match es.entry(p.total_weight()) {
+                    Entry::Vacant(v)   => { 
+                        println!("v = {:?}", v);
+                        let mut a = Vec::new();
+                        a.push(p.name.clone());
+                        v.insert(a); 
+                    },
+                    Entry::Occupied(mut o) => {
+                        println!("o = {:?}", o);
+                        o.get_mut().push(p.name.clone());
+                    }
+                };
+            }
+        }
+        println!("es = {:?}", es);
+        println!("es.len() = {}", es.len());
+        if es.len() == 1 {
+            println!("ancestry = {:?}", ancestry);
+            break;
+        }
+        let mut standard: u32 = 0;
+        let mut deviant: u32 = 0;
+        for (k,v) in es {
+            if v.len() == 1 {
+                println!("v = {:?}", v);
+                stack.push(v[0].clone());
+                deviant = k;
+            } else {
+                standard = k;
+            }
+        }
+        println!("standard = {}, deviant = {}", standard, deviant);
+    }
 }
 
 fn main() {
@@ -176,4 +244,5 @@ fn main() {
 //    println!("");
 //    println!("hm = {:?}", hm);
     display_tower(&hm, bottom.clone());
+    find_imbalance(&hm, bottom.clone());
 }
