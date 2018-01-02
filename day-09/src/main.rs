@@ -25,7 +25,8 @@ struct State {
     cancel: bool,
     garbage: bool,
     depth: u32,
-    scores: Vec<u32>
+    scores: Vec<u32>,
+    garbage_total: u32
 }
 
 impl State {
@@ -34,7 +35,8 @@ impl State {
             cancel: false,
             garbage: false,
             depth: 0,
-            scores: Vec::new()
+            scores: Vec::new(),
+            garbage_total: 0
         }
     }
 
@@ -53,6 +55,8 @@ impl State {
         if self.garbage == true {
             if token == Token::GarbageEnd {
                 self.garbage = false;
+            } else {
+                self.garbage_total += 1;
             }
             return;
         }
@@ -75,6 +79,10 @@ impl State {
 
     fn total_score(&self) -> u32 {
         self.scores.iter().sum()
+    }
+
+    fn total_garbage(&self) -> u32 {
+        self.garbage_total
     }
 }
 
@@ -104,6 +112,7 @@ fn main() {
     parse_line(input.trim(), &mut state);
 //    println!("state = {:?}", state);
     println!("total score = {}", state.total_score());
+    println!("total garbage = {}", state.total_garbage());
 }
 
 #[cfg(test)]
@@ -111,58 +120,107 @@ mod tests {
     use super::*;
 
     #[test]
-    fn example_1() {
+    fn part1_example_1() {
         let mut state = State::new();
         parse_line("{}", &mut state);
         assert_eq!(1, state.total_score());
     }
 
     #[test]
-    fn example_2() {
+    fn part1_example_2() {
         let mut state = State::new();
         parse_line("{{{}}}", &mut state);
         assert_eq!(6, state.total_score());
     }
 
     #[test]
-    fn example_3() {
+    fn part1_example_3() {
         let mut state = State::new();
         parse_line("{{},{}}", &mut state);
         assert_eq!(5, state.total_score());
     }
 
     #[test]
-    fn example_4() {
+    fn part1_example_4() {
         let mut state = State::new();
         parse_line("{{{},{},{{}}}}", &mut state);
         assert_eq!(16, state.total_score());
     }
 
     #[test]
-    fn example_5() {
+    fn part1_example_5() {
         let mut state = State::new();
         parse_line("{<a>,<a>,<a>,<a>}", &mut state);
         assert_eq!(1, state.total_score());
     }
 
     #[test]
-    fn example_6() {
+    fn part1_example_6() {
         let mut state = State::new();
         parse_line("{{<ab>},{<ab>},{<ab>},{<ab>}}", &mut state);
         assert_eq!(9, state.total_score());
     }
 
     #[test]
-    fn example_7() {
+    fn part1_example_7() {
         let mut state = State::new();
         parse_line("{{<!!>},{<!!>},{<!!>},{<!!>}}", &mut state);
         assert_eq!(9, state.total_score());
     }
 
     #[test]
-    fn example_8() {
+    fn part1_example_8() {
         let mut state = State::new();
         parse_line("{{<a!>},{<a!>},{<a!>},{<ab>}}", &mut state);
         assert_eq!(3, state.total_score());
+    }
+
+    #[test]
+    fn part2_example_1() {
+        let mut state = State::new();
+        parse_line("<>", &mut state);
+        assert_eq!(0, state.total_garbage());
+    }
+
+    #[test]
+    fn part2_example_2() {
+        let mut state = State::new();
+        parse_line("<random characters>", &mut state);
+        assert_eq!(17, state.total_garbage());
+    }
+
+    #[test]
+    fn part2_example_3() {
+        let mut state = State::new();
+        parse_line("<<<<>", &mut state);
+        assert_eq!(3, state.total_garbage());
+    }
+
+    #[test]
+    fn part2_example_4() {
+        let mut state = State::new();
+        parse_line("<{!>}>", &mut state);
+        assert_eq!(2, state.total_garbage());
+    }
+
+    #[test]
+    fn part2_example_5() {
+        let mut state = State::new();
+        parse_line("<!!>", &mut state);
+        assert_eq!(0, state.total_garbage());
+    }
+
+    #[test]
+    fn part2_example_6() {
+        let mut state = State::new();
+        parse_line("<!!!>>", &mut state);
+        assert_eq!(0, state.total_garbage());
+    }
+
+    #[test]
+    fn part2_example_7() {
+        let mut state = State::new();
+        parse_line("<{o\"i!a,<}i<a>", &mut state);
+        assert_eq!(10, state.total_garbage());
     }
 }

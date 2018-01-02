@@ -6,7 +6,7 @@ cancel = { "!" }
 
 alpha = { 'a'..'z' }
 digit = { '0'..'9' }
-other = { alpha | digit | "," | "'" | "\"" }
+other = { alpha | digit | "," | "'" | "\"" | " " }
 
 token = _{ groupstart | groupend | garbagestart | garbageend | cancel | other }
 stream = _{ (token)+ }
