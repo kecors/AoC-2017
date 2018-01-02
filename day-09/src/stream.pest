@@ -1,0 +1,12 @@
+groupstart = { "{" }
+groupend = { "}" }
+garbagestart = { "<" }
+garbageend = { ">" }
+cancel = { "!" }
+
+alpha = { 'a'..'z' }
+digit = { '0'..'9' }
+other = { alpha | digit | "," | "'" | "\"" }
+
+token = _{ groupstart | groupend | garbagestart | garbageend | cancel | other }
+stream = _{ (token)+ }
