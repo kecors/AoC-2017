@@ -14,7 +14,8 @@ enum Direction {
 struct State {
     x: i32,
     y: i32,
-    z: i32
+    z: i32,
+    maximum_distance: i32
 }
 
 impl State {
@@ -30,6 +31,15 @@ impl State {
             Direction::S  => { self.z += 1; self.x -= 1; },
             Direction::SW => { self.y += 1; self.x -= 1; },
             Direction::NW => { self.y += 1; self.z -= 1; },
+        }
+        self.update_maximum_distance();
+    }
+
+    fn update_maximum_distance(&mut self) {
+        for distance in [self.x.abs(), self.y.abs(), self.z.abs()].iter() {
+            if *distance > self.maximum_distance {
+                self.maximum_distance = *distance;
+            }
         }
     }
 
@@ -67,11 +77,12 @@ fn main() {
 //    println!("directions = {:?}", directions);
 
     let mut state = State::new();
-//    println!("state = {:?}", state);
 
     for direction in directions {
         state.go(direction);
     }
 //    println!("state = {:?}", state);
+
     println!("fewest steps = {}", state.fewest_steps());
+    println!("maximum distance = {}", state.maximum_distance);
 }
