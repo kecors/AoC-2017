@@ -59,6 +59,41 @@ impl State {
 
         connected.len() as u32
     }
+
+    fn purge_group(&mut self, id: u32) {
+        let mut stack: Vec<u32> = Vec::new();
+
+        stack.push(id);
+
+        loop {
+            match stack.pop() {
+                None     => { break; },
+                Some(id) => {
+                    if let Some(piped) = self.pipes.get(&id) {
+                        stack.extend(piped);
+                    }
+                    self.pipes.remove(&id);
+                }
+            }
+        }
+    }
+
+    fn count_groups(&mut self) -> u32 {
+        let mut group_count: u32 = 0;
+
+        loop {
+            let id: u32;
+            if let Some(key) = self.pipes.keys().next() {
+                id = *key;
+            } else {
+                break;
+            }
+            self.purge_group(id);
+            group_count += 1;
+        }
+
+        group_count
+    }
 }
 
 fn parse_line(line: &str) -> Linking {
@@ -95,4 +130,6 @@ fn main() {
     }
 //    println!("state = {:?}", state);
     println!("programs connected to {} = {}", 0, state.count_connected(0));
+
+    println!("group count = {}", state.count_groups());
 }
