@@ -1,0 +1,6 @@
+digit = { '0'..'9' }
+
+id = { (digit)+ }
+piped = { (digit)+ }
+
+linking = _{ id ~ " <-> " ~ piped ~ (", " ~ piped)* }
