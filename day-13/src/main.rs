@@ -1,13 +1,13 @@
 use std::io::{stdin, Read};
 use std::collections::HashMap;
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 enum Direction {
     UP,
     DOWN
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 struct Layer {
     depth: u32,
     range: u32,
@@ -74,7 +74,7 @@ impl State {
     }
 
     fn travel(&mut self) {
-        for depth in 0..self.maximum_depth() {
+        for depth in 0..self.maximum_depth()+1 {
             let mut severity: u32 = 0;
             if let Some(layer) = self.layer_hm.get(&depth) {
                 if layer.scanner == 0 {
@@ -87,6 +87,28 @@ impl State {
             }
         }
     }
+}
+
+//
+// This is far more efficient than a brute force approach
+//
+fn find_minimal_safe_delay(layers: &Vec<Layer>) -> u32 {
+    let mut delay: u32 = 0;
+    loop {
+        let mut caught: bool = false;
+        for layer in layers {
+            if (delay + layer.depth) % ((layer.range - 1) * 2) == 0 {
+                caught = true;
+                break;
+            }
+        }
+        if caught == true {
+            delay += 1;
+        } else {
+            break;
+        }
+    }
+    delay
 }
 
 fn parse_line(line: &str) -> Layer {
@@ -106,7 +128,10 @@ fn main() {
     let layers: Vec<Layer> = input.lines().map(|line| parse_line(line)).collect();
 //    println!("layers = {:?}", layers);
 
-    let mut state = State::new(layers);
+    let mut state = State::new(layers.clone());
     state.travel();
-    println!("severity = {}", state.severity);
+    println!("part 1: severity = {}", state.severity);
+
+    let delay = find_minimal_safe_delay(&layers);
+    println!("part 2: safe travel with delay = {}", delay);
 }
