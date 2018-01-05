@@ -1,3 +1,6 @@
+//
+// Extracted from day 10 solution
+//
 #[derive(Debug)]
 struct KnotHash {
     list: Vec<u32>,
@@ -64,7 +67,7 @@ fn calculate_dense_hash(spare_hash: &Vec<u32>) -> Vec<u32> {
 }
 
 // Assuming dense hash has 16 elements
-fn calculate_hexadecimal_string(dense_hash: &Vec<u32>) -> String {
+fn convert_densehash_to_hexstring(dense_hash: &Vec<u32>) -> String {
     let mut result = String::new();
 
     for value in dense_hash {
@@ -75,7 +78,7 @@ fn calculate_hexadecimal_string(dense_hash: &Vec<u32>) -> String {
     result
 }
 
-pub fn make_hexadecimal_string(input: &String) -> String {
+pub fn make_hexstring(input: &String) -> String {
     let mut lengths: Vec<u8> = Vec::new();
     lengths.extend(input.as_bytes());
     lengths.extend(&[17, 31, 73, 47, 23]);
@@ -89,34 +92,6 @@ pub fn make_hexadecimal_string(input: &String) -> String {
     }
 
     let dh = calculate_dense_hash(&kh.list);
-    let hs = calculate_hexadecimal_string(&dh);
+    let hs = convert_densehash_to_hexstring(&dh);
     return hs;
-}
-
-pub fn hexstring_to_binary(hexstring: &String) -> Vec<u32> {
-    let mut result = Vec::new();
-
-    for c in hexstring.chars() {
-        match c {
-            '0' => { result.extend(&[0,0,0,0]); },
-            '1' => { result.extend(&[0,0,0,1]); },
-            '2' => { result.extend(&[0,0,1,0]); },
-            '3' => { result.extend(&[0,0,1,1]); },
-            '4' => { result.extend(&[0,1,0,0]); },
-            '5' => { result.extend(&[0,1,0,1]); },
-            '6' => { result.extend(&[0,1,1,0]); },
-            '7' => { result.extend(&[0,1,1,1]); },
-            '8' => { result.extend(&[1,0,0,0]); },
-            '9' => { result.extend(&[1,0,0,1]); },
-            'a' => { result.extend(&[1,0,1,0]); },
-            'b' => { result.extend(&[1,0,1,1]); },
-            'c' => { result.extend(&[1,1,0,0]); },
-            'd' => { result.extend(&[1,1,0,1]); },
-            'e' => { result.extend(&[1,1,1,0]); },
-            'f' => { result.extend(&[1,1,1,1]); },
-            _   => { unimplemented!("hexstring_to_binary"); }
-        }
-    }
-
-    result
 }
