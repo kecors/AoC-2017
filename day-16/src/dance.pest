@@ -1,0 +1,14 @@
+digit = { '0'..'9' }
+
+size = { (digit)+ }
+position1 = { (digit)+ }
+position2 = { (digit)+ }
+program1 = { 'a'..'p' }
+program2 = { 'a'..'p' }
+
+spin = _{ "s" ~ size }
+exchange = _{ "x" ~ position1 ~ "/" ~ position2 }
+partner = _{ "p" ~ program1 ~ "/" ~ program2 }
+
+step = _{ (spin | exchange | partner) }
+dance = _{ step ~ ("," ~ (step))* }
