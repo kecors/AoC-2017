@@ -1,4 +1,7 @@
 use std::io;
+use std::collections::HashMap;
+use std::collections::hash_map::Entry;
+use std::iter::FromIterator;
 
 extern crate pest;
 #[macro_use]
@@ -30,17 +33,17 @@ impl State {
         }
     }
 
-    fn dance(&mut self, step: Step) {
+    fn dance(&mut self, step: &Step) {
         match step {
-            Step::Spin(size) => {
+            &Step::Spin(size) => {
                 let mut tail: Vec<char> = self.line.split_off(16 - size);
                 tail.extend(self.line.iter());
                 self.line = tail;
             },
-            Step::Exchange(position1, position2) => {
+            &Step::Exchange(position1, position2) => {
                 self.line.swap(position1, position2);
             },
-            Step::Partner(program1, program2) => {
+            &Step::Partner(program1, program2) => {
                 let position1 = self.line.iter()
                                          .position(|&x| x == program1)
                                          .unwrap();
@@ -50,14 +53,6 @@ impl State {
                 self.line.swap(position1, position2);
             }
         }
-    }
-
-    fn display(&mut self) {
-        print!("part1: [");
-        for program in self.line.iter() {
-            print!("{}", program);
-        }
-        println!("]");
     }
 }
 
@@ -106,11 +101,42 @@ fn main() {
     let steps: Vec<Step> = parse_line(input.trim());
 //    println!("steps = {:?}", steps);
 
+    // I found an internet discussion of Landau's function, which
+    // establishes that a cycle is inevitable. 
+
+    // Use this to identify the cycle length
+    let mut transforms: HashMap<Vec<char>, Vec<char>> = HashMap::new();
+    // Track all permutations in order; index into this once
+    // the offset is known
+    let mut permutations: Vec<Vec<char>> = Vec::new();
+    // Part 1 is concerned with the first run only
+    let mut first_run: bool = true;
+
     let mut state = State::new();
-
-    for step in steps {
-        state.dance(step);
+    loop {
+        let line_before = state.line.clone();
+        for step in steps.iter() {
+            state.dance(step);
+        }
+        let line_after = state.line.clone();
+        let transforms_length: usize = transforms.len();
+        match transforms.entry(line_before) {
+            Entry::Vacant(v) => {
+                permutations.push(line_after.clone());
+                v.insert(line_after);
+            },
+            Entry::Occupied(_) => {
+                let offset = 1000000000 % transforms_length;
+//                println!("1000000000 % {} = {}", transforms_length, offset);
+                println!("part 2: [{}]", 
+                         String::from_iter(&permutations[offset-1])
+                        );
+                break;
+            }
+        }
+        if first_run == true {
+            println!("part 1: [{}]", String::from_iter(&state.line));
+            first_run = false;
+        }
     }
-
-    state.display();
 }
