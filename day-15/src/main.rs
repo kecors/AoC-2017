@@ -7,28 +7,33 @@ const GEN_B_FACTOR: u64 = 48271;
 #[derive(Debug)]
 struct Generator {
     value: u64,
-    factor: u64
+    factor: u64,
+    criteria: u64
 }
 
 impl Generator {
-    fn new(start_value: u64, factor: u64) -> Generator {
+    fn new(start_value: u64, factor: u64, criteria: u64) -> Generator {
         Generator {
             value: start_value,
-            factor: factor
+            factor: factor,
+            criteria: criteria
         }
     }
 
     fn create_next_value(&mut self) {
-        self.value = (self.value * self.factor) % DIVISOR;
+        loop {
+            self.value = (self.value * self.factor) % DIVISOR;
+            if self.value % self.criteria == 0 {
+                break;
+            }
+        }
     }
 }
 
-fn execute(start_a: u64, start_b: u64) -> u32 {
+fn execute(gen_a: &mut Generator, gen_b: &mut Generator, judge_limit: u64) -> u32 {
     let mut matches: u32 = 0;
-    let mut gen_a = Generator::new(start_a, GEN_A_FACTOR);
-    let mut gen_b = Generator::new(start_b, GEN_B_FACTOR);
 
-    for _ in 0..40000000 {
+    for _ in 0..judge_limit {
         gen_a.create_next_value();
         gen_b.create_next_value();
         if gen_a.value & 0xffff == gen_b.value & 0xffff {
@@ -48,6 +53,13 @@ fn main() {
     let line_b = input.lines().last().unwrap();
     let start_b: u64 = line_b.split(' ').last().unwrap().parse().unwrap();
 
-    let matches: u32 = execute(start_a, start_b);
+    let mut gen_a = Generator::new(start_a, GEN_A_FACTOR, 1);
+    let mut gen_b = Generator::new(start_b, GEN_B_FACTOR, 1);
+    let matches: u32 = execute(&mut gen_a, &mut gen_b, 40000000);
     println!("part 1: matches = {}", matches);
+
+    let mut gen_a = Generator::new(start_a, GEN_A_FACTOR, 4);
+    let mut gen_b = Generator::new(start_b, GEN_B_FACTOR, 8);
+    let matches: u32 = execute(&mut gen_a, &mut gen_b, 5000000);
+    println!("part 2: matches = {}", matches);
 }
