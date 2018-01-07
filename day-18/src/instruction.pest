@@ -1,0 +1,39 @@
+alpha = { 'a'..'z' }
+digit = { '0'..'9' }
+number = { ("-")? ~ (digit)+ }
+
+snd1r = { alpha }
+snd1n = { number }
+_snd = _{ "snd " ~ (snd1r | snd1n) }
+
+set1r = { alpha }
+set2r = { alpha }
+set2n = { number }
+_set = _{ "set " ~ set1r ~ " " ~ (set2r | set2n) }
+
+add1r = { alpha }
+add2r = { alpha }
+add2n = { number }
+_add = _{ "add " ~ add1r ~ " " ~ (add2r | add2n) }
+
+mul1r = { alpha }
+mul2r = { alpha }
+mul2n = { number }
+_mul = _{ "mul " ~ mul1r ~ " " ~ (mul2r | mul2n) }
+
+mod1r = { alpha }
+mod2r = { alpha }
+mod2n = { number }
+_mod = _{ "mod " ~ mod1r ~ " " ~ (mod2r | mod2n) }
+
+rcv1r = { alpha }
+rcv1n = { number }
+_rcv = _{ "rcv " ~ (rcv1r | rcv1n) }
+
+jgz1r = { alpha }
+jgz1n = { number }
+jgz2r = { alpha }
+jgz2n = { number }
+_jgz = _{ "jgz " ~ (jgz1r | jgz1n) ~ " " ~ (jgz2r | jgz2n) }
+
+line = _{ (_snd | _set | _add | _mul | _mod | _rcv | _jgz) }
