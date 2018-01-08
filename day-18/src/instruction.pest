@@ -1,39 +1,37 @@
 alpha = { 'a'..'z' }
 digit = { '0'..'9' }
-number = { ("-")? ~ (digit)+ }
 
-snd1r = { alpha }
-snd1n = { number }
-_snd = _{ "snd " ~ (snd1r | snd1n) }
+register = _ { alpha }
+number = _{ ("-")? ~ (digit)+ }
 
-set1r = { alpha }
-set2r = { alpha }
-set2n = { number }
-_set = _{ "set " ~ set1r ~ " " ~ (set2r | set2n) }
+snd_r = { register }
+snd_n = { number }
+_snd = _{ "snd " ~ (snd_r | snd_n) }
 
-add1r = { alpha }
-add2r = { alpha }
-add2n = { number }
-_add = _{ "add " ~ add1r ~ " " ~ (add2r | add2n) }
+set_rr = { register ~ " " ~ register }
+set_rn = { register ~ " " ~ number }
+_set = _{ "set " ~ (set_rr | set_rn) }
 
-mul1r = { alpha }
-mul2r = { alpha }
-mul2n = { number }
-_mul = _{ "mul " ~ mul1r ~ " " ~ (mul2r | mul2n) }
+add_rr = { register ~ " " ~ register }
+add_rn = { register ~ " " ~ number }
+_add = _{ "add " ~ (add_rr | add_rn) }
 
-mod1r = { alpha }
-mod2r = { alpha }
-mod2n = { number }
-_mod = _{ "mod " ~ mod1r ~ " " ~ (mod2r | mod2n) }
+mul_rr = { register ~ " " ~ register }
+mul_rn = { register ~ " " ~ number }
+_mul = _{ "mul " ~ (mul_rr | mul_rn) }
 
-rcv1r = { alpha }
-rcv1n = { number }
-_rcv = _{ "rcv " ~ (rcv1r | rcv1n) }
+mod_rr = { register ~ " " ~ register }
+mod_rn = { register ~ " " ~ number }
+_mod = _{ "mod " ~ (mod_rr | mod_rn) }
 
-jgz1r = { alpha }
-jgz1n = { number }
-jgz2r = { alpha }
-jgz2n = { number }
-_jgz = _{ "jgz " ~ (jgz1r | jgz1n) ~ " " ~ (jgz2r | jgz2n) }
+rcv_r = { register }
+rcv_n = { number }
+_rcv = _{ "rcv " ~ (rcv_r | rcv_n) }
+
+jgz_rr = { register ~ " " ~ register }
+jgz_rn = { register ~ " " ~ number }
+jgz_nr = { number ~ " " ~ register }
+jgz_nn = { number ~ " " ~ number }
+_jgz = _{ "jgz " ~ (jgz_rr | jgz_rn | jgz_nr | jgz_nn) }
 
 line = _{ (_snd | _set | _add | _mul | _mod | _rcv | _jgz) }
