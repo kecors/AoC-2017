@@ -15,7 +15,8 @@ struct State {
     row: usize,
     column: usize,
     direction: Direction,
-    letters: Vec<char>
+    letters: Vec<char>,
+    steps: u32
 }
 
 impl State {
@@ -37,7 +38,8 @@ impl State {
             row: 0,
             column: column,
             direction: Direction::DOWN,
-            letters: Vec::new()
+            letters: Vec::new(),
+            steps: 0
         }
     }
 
@@ -49,10 +51,12 @@ impl State {
                 Direction::LEFT  => { self.column -= 1; },
                 Direction::RIGHT => { self.column += 1; }
             }
+            self.steps += 1;
             match self.diagram[self.row][self.column] {
                 ' ' => {
                     println!("part 1: letters = {}", 
                              String::from_iter(&self.letters));
+                    println!("part 2: took {} steps", self.steps);
                     break;
                 },
                 '+' => {
