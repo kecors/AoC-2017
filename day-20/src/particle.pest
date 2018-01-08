@@ -1,0 +1,19 @@
+digit = { '0'..'9' }
+number = { ("-")? ~ (digit)+ }
+
+px = { number }
+py = { number }
+pz = { number }
+position = _{ "p=<" ~ px ~ "," ~ py ~ "," ~ pz ~ ">" }
+
+vx = { number }
+vy = { number }
+vz = { number }
+velocity = _{ "v=<" ~ vx ~ "," ~ vy ~ "," ~ vz ~ ">" }
+
+ax = { number }
+ay = { number }
+az = { number }
+acceleration = _{ "a=<" ~ ax ~ "," ~ ay ~ "," ~ az ~ ">" }
+
+particle = _{ position ~ ", " ~ velocity ~ ", " ~ acceleration }
