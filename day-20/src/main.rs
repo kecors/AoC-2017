@@ -1,5 +1,7 @@
 use std::io::{stdin, Read};
 use std::fmt::{Display, Formatter, Error};
+use std::collections::HashMap;
+use std::collections::hash_map::Entry;
 
 extern crate pest;
 #[macro_use]
@@ -11,14 +13,14 @@ use pest::Parser;
 #[grammar = "particle.pest"]
 struct ParticleParser;
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Eq, PartialEq, Hash, Clone)]
 struct Coordinates {
     x: i64,
     y: i64,
     z: i64
 }
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 struct Particle {
     position: Coordinates,
     velocity: Coordinates,
@@ -30,7 +32,7 @@ impl Particle {
         Particle::default()
     }
 
-    fn tick(&mut self) {
+    fn tick(&mut self) -> Coordinates {
         self.velocity.x += self.acceleration.x;
         self.velocity.y += self.acceleration.y;
         self.velocity.z += self.acceleration.z;
@@ -38,6 +40,8 @@ impl Particle {
         self.position.x += self.velocity.x;
         self.position.y += self.velocity.y;
         self.position.z += self.velocity.z;
+
+        self.position.clone()
     }
 
     fn manhattan_distance(&self) -> i64 {
@@ -56,20 +60,49 @@ impl Display for Particle {
 
 #[derive(Debug)]
 struct State {
-    particles: Vec<Particle>
+    particles: Vec<Particle>,
+    collision_detector: HashMap<Coordinates, Vec<usize>>
 }
 
 impl State {
     fn new(particles: Vec<Particle>) -> State {
         State {
-            particles
+            particles: particles,
+            collision_detector: HashMap::new()
         }
     }
 
-    fn tick(&mut self) {
-        for particle in self.particles.iter_mut() {
-            particle.tick();
+    fn tick(&mut self) -> usize {
+        self.collision_detector = HashMap::new();
+
+        for (index, particle) in self.particles.iter_mut().enumerate() {
+            let position = particle.tick();
+
+            match self.collision_detector.entry(position) {
+                Entry::Vacant(vacant) => {
+                    let mut indices = Vec::new();
+                    indices.push(index);
+                    vacant.insert(indices);
+                },
+                Entry::Occupied(mut occupied) => {
+                    occupied.get_mut().push(index);
+                }
+            }
         }
+
+        // Check for collisions and remove affected particles
+        let mut collided: Vec<usize> = Vec::new();
+        for indices in self.collision_detector.values() {
+            if indices.len() > 1 {
+                collided.extend(indices);
+            }
+        }
+        collided.sort();
+        collided.reverse();
+        for index in collided.iter() {
+            self.particles.remove(*index);
+        }
+        collided.len()
     }
 
     fn closest(&self) {
@@ -82,6 +115,10 @@ impl State {
                                     )
                                     .unwrap();
         println!("[{}] {}", index, particle);
+    }
+
+    fn particle_count(&self) -> usize {
+        self.particles.len()
     }
 }
 
@@ -140,9 +177,15 @@ fn main() {
     let mut state = State::new(particles);
 
     // This arbitrarily selected number of repetitions yields
-    // the correct answer
-    for _ in 0..500 {
+    // the correct answer for part 1 and for part 2
+    for x in 0..500 {
+        print!("{:4} ", x);
         state.closest();
-        state.tick();
+        let collided_count = state.tick();
+        if collided_count > 0 {
+            println!("---- {} collided particles removed; {} remain", 
+                     collided_count, state.particle_count());
+        }
     }
+    println!("part 2: particle count = {:?}", state.particle_count());
 }
