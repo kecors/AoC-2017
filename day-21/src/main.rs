@@ -112,8 +112,8 @@ impl Grid {
         Grid(result)
     }
 
-    fn pixels_on_count(&self) -> u32 {
-        let mut result: u32 = 0;
+    fn pixels_on_count(&self) -> u64 {
+        let mut result: u64 = 0;
         for subvec in self.0.iter() {
             for value in subvec.iter() {
                 if *value == true {
@@ -172,12 +172,14 @@ impl State {
         self.image = Grid::combine(s2);
     }
 
+    #[allow(dead_code)]
     fn display_image(&self) {
         print_border("!", self.image.size());
         print!("{}", self.image);
         print_border("~", self.image.size());
     }
 
+    #[allow(dead_code)]
     fn display_rules(&self) {
         for (k,v) in self.rules.iter() {
             print_border("-", v.size());
@@ -186,7 +188,7 @@ impl State {
         }
     }
 
-    fn pixels_on_count(&self) -> u32 {
+    fn pixels_on_count(&self) -> u64 {
         self.image.pixels_on_count()
     }
 }
@@ -213,10 +215,14 @@ fn main() {
         state.add_rule(input_pattern, output_pattern);
     }
 
-    state.display_image();
-    for _ in 0..5 {
+//    state.display_image();
+    for x in 0..18 {
         state.iterate();
-        state.display_image();
+//        state.display_image();
+        if x == 4 {
+            println!("part 1: pixels on = {}", state.pixels_on_count());
+        }
+//        println!("x = {}, count = {}", x, state.pixels_on_count());
     }
-    println!("part 1: pixels on = {}", state.pixels_on_count());
+    println!("part 2: pixels on = {}", state.pixels_on_count());
 }
