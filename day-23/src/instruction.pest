@@ -1,0 +1,25 @@
+alpha = { 'a'..'z' }
+digit = { '0'..'9' }
+
+register = _ { alpha }
+number = _{ ("-")? ~ (digit)+ }
+
+set_rr = { register ~ " " ~ register }
+set_rn = { register ~ " " ~ number }
+_set = _{ "set " ~ (set_rr | set_rn) }
+
+sub_rr = { register ~ " " ~ register }
+sub_rn = { register ~ " " ~ number }
+_sub = _{ "sub " ~ (sub_rr | sub_rn) }
+
+mul_rr = { register ~ " " ~ register }
+mul_rn = { register ~ " " ~ number }
+_mul = _{ "mul " ~ (mul_rr | mul_rn) }
+
+jnz_rr = { register ~ " " ~ register }
+jnz_rn = { register ~ " " ~ number }
+jnz_nr = { number ~ " " ~ register }
+jnz_nn = { number ~ " " ~ number }
+_jnz = _{ "jnz " ~ (jnz_rr | jnz_rn | jnz_nr | jnz_nn) }
+
+line = _{ ( _set | _sub | _mul | _jnz) }
