@@ -25,12 +25,25 @@ impl Coprocessor {
         }
     }
 
-    pub fn execute(&mut self) {
+    pub fn set_register(&mut self, register: char, new_value: i64) {
+        if let Some(value) = self.registers.get_mut(&register) {
+            *value = new_value;
+        }
+    }
+
+    pub fn execute(&mut self, part_2_flag: bool) {
         let mut jumped: bool = false;
         loop {
             if self.instruction_pointer as usize >= self.code_segment.len() {
-                println!("part 1: mul count = {}", self.mul_count);
-                return;
+                if part_2_flag {
+                    if let Some(value) = self.registers.get(&'h') {
+                        println!("part 2: register h contains {}", *value);
+                        return;
+                    }
+                } else {
+                    println!("part 1: mul count = {}", self.mul_count);
+                    return;
+                }
             }
             match self.code_segment[self.instruction_pointer as usize] {
                 Instruction::NoOp => {
