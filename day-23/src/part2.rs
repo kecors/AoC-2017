@@ -42,13 +42,12 @@ impl State {
             self.c = self.b;
             self.c += 17000;
         }
-        loop {   // i09
+        'i09: loop {
             self.f = 1;
             self.d = 2;
-            loop {   // i11
-                let mut break_11 = false;
+            'i11: loop {
                 self.e = 2;
-                loop {   // i12
+                'i12: loop {
                     self.g = self.d;
                     self.g *= self.e;
                     self.g -= self.b;
@@ -60,7 +59,7 @@ impl State {
                     self.g -= self.b;
                     // The following optimization makes a huge difference
                     if self.b % self.d == 0 && self.g != 0 {
-                        continue;
+                        continue 'i12;
                     }
                     self.d += 1;
                     self.g = self.d;
@@ -77,12 +76,8 @@ impl State {
                         println!("part 2: h = {}", self.h);
                         return;
                     } else {
-                        break_11 = true;
-                        break;
+                        break 'i11;
                     }
-                }
-                if break_11 == true {
-                    break;
                 }
             }
             self.b += 17;
