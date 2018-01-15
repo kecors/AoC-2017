@@ -61,7 +61,9 @@ impl Interim {
 struct State {
     components: Vec<Component>,
     port_hm: HashMap<u32, Vec<u32>>,
-    maximum_weight: u32
+    maximum_weight: u32,
+    longest_bridge_len: usize,
+    longest_bridge_weight: u32
 }
 
 impl State {
@@ -70,7 +72,9 @@ impl State {
         State {
             components: components,
             port_hm: port_hm,
-            maximum_weight: 0
+            maximum_weight: 0,
+            longest_bridge_len: 0,
+            longest_bridge_weight: 0
         }
     }
 
@@ -112,6 +116,14 @@ impl State {
             if stack_add_flag == false {
                 if interim.sum() > self.maximum_weight {
                     self.maximum_weight = interim.sum();
+                }
+                if interim.bridge.len() > self.longest_bridge_len {
+                    self.longest_bridge_len = interim.bridge.len();
+                    self.longest_bridge_weight = interim.sum();
+                } else if interim.bridge.len() == self.longest_bridge_len {
+                    if interim.sum() > self.longest_bridge_weight {
+                        self.longest_bridge_weight = interim.sum();
+                    }
                 }
             }
         }
@@ -167,4 +179,6 @@ fn main() {
     let mut state = State::new(components);
     state.run();
     println!("part 1: maximum weight = {}", state.maximum_weight);
+    println!("part 2: longest bridge weight = {}", 
+             state.longest_bridge_weight);
 }
