@@ -1,0 +1,29 @@
+alpha = _{ 'A'..'F' }
+digit = _{ '0'..'9' }
+
+state = _{ alpha }
+number = _{ (digit)+ }
+value = _{ ( "0" | "1" ) }
+direction = _{ ( "left" | "right" ) }
+
+begin_state = { state }
+step_limit = { number }
+
+state_id = { state }
+current_value = { value }
+write_value = { value }
+move_direction = { direction }
+next_state = { state }
+
+line_begin = _{ "Begin in state " ~ begin_state ~ "." }
+line_checksum = _{ "Perform a diagnostic checksum after " ~ step_limit ~ " steps." }
+
+line_in_state = _{ "In state " ~ state_id ~ ":" }
+line_current_value = _{ "  If the current value is " ~ current_value ~ ":" }
+line_write_value = _{ "    - Write the value " ~ write_value ~ "." }
+line_move_direction = _{ "    - Move one slot to the " ~ move_direction ~ "." }
+line_next_state = _{ "    - Continue with state " ~ next_state ~ "." }
+
+line_blank = _{ "" }
+
+line = _{ ( line_begin | line_checksum | line_in_state | line_current_value | line_write_value | line_move_direction | line_next_state | line_blank ) }
