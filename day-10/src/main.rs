@@ -4,7 +4,7 @@ use std::io;
 struct KnotHash {
     list: Vec<u32>,
     position: usize,
-    skip: usize
+    skip: usize,
 }
 
 impl KnotHash {
@@ -16,18 +16,18 @@ impl KnotHash {
         KnotHash {
             list: list,
             position: 0,
-            skip: 0
+            skip: 0,
         }
     }
 
     fn twist(&mut self, length: usize) {
-//        println!("pre  twist: {:?}, {}", self, length);
-        // - Reverse the order of that length of elements in the list, 
+        //println!("pre  twist: {:?}, {}", self, length);
+        // - Reverse the order of that length of elements in the list,
         // starting with the element at the current position.
         let mut forward = self.position;
         let mut backward = (self.position + length - 1) % self.list.len();
-        for _ in 0..(length/2) {
-//            println!("forward = {}, backward = {}", forward, backward);
+        for _ in 0..(length / 2) {
+            //println!("forward = {}, backward = {}", forward, backward);
             self.list.swap(forward, backward);
             forward += 1;
             if forward == self.list.len() {
@@ -40,7 +40,7 @@ impl KnotHash {
             }
         }
 
-        // - Move the current position forward by that length plus 
+        // - Move the current position forward by that length plus
         // the skip size.
         self.position = (self.position + length + self.skip) % self.list.len();
 
@@ -82,27 +82,23 @@ fn calculate_hexadecimal_string(dense_hash: &Vec<u32>) -> String {
 }
 
 fn do_part1(input: &String) {
-    let strs: Vec<&str> = input.trim()
-                               .split(',')
-                               .collect();
-    let lengths: Vec<usize> = strs.iter()
-                                .map(|x| x.parse::<usize>().unwrap())
-                                .collect();
-//    println!("lengths = {:?}", lengths);
+    let strs: Vec<&str> = input.trim().split(',').collect();
+    let lengths: Vec<usize> = strs.iter().map(|x| x.parse::<usize>().unwrap()).collect();
+    //println!("lengths = {:?}", lengths);
     let mut kh = KnotHash::new(256);
     for length in lengths {
         kh.twist(length);
     }
-//    println!("kh = {:?}", kh);
+    //println!("kh = {:?}", kh);
     println!("product first two = {}", kh.product_first_two());
 }
 
 fn do_part2(input: &String) -> String {
-//    let mut lengths = ascii(input.as_str());
+    //let mut lengths = ascii(input.as_str());
     let mut lengths: Vec<u8> = Vec::new();
     lengths.extend(input.as_bytes());
-    lengths.extend(&[17,31,73,47,23]);
-//    println!("lengths = {:?}", lengths);
+    lengths.extend(&[17, 31, 73, 47, 23]);
+    //println!("lengths = {:?}", lengths);
 
     let mut kh = KnotHash::new(256);
     for _ in 0..64 {
@@ -111,13 +107,13 @@ fn do_part2(input: &String) -> String {
             kh.twist(p);
         }
     }
-//    println!("kh = {:?}", kh);
-//    println!("product first two = {}", kh.product_first_two());
+    //println!("kh = {:?}", kh);
+    //println!("product first two = {}", kh.product_first_two());
 
     let dh = calculate_dense_hash(&kh.list);
-//    println!("dh = {:?}", dh);
+    //println!("dh = {:?}", dh);
     let hs = calculate_hexadecimal_string(&dh);
-    return hs
+    return hs;
 }
 
 fn main() {

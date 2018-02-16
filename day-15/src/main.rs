@@ -8,7 +8,7 @@ const GEN_B_FACTOR: u64 = 48271;
 struct Generator {
     value: u64,
     factor: u64,
-    criteria: u64
+    criteria: u64,
 }
 
 impl Generator {
@@ -16,7 +16,7 @@ impl Generator {
         Generator {
             value: start_value,
             factor: factor,
-            criteria: criteria
+            criteria: criteria,
         }
     }
 

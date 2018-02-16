@@ -1,4 +1,4 @@
-use std::fmt::{Display, Formatter, Error};
+use std::fmt::{Display, Error, Formatter};
 
 #[derive(Debug, Default)]
 pub struct State {
@@ -14,15 +14,11 @@ pub struct State {
 
 impl Display for State {
     fn fmt(&self, f: &mut Formatter) -> Result<(), Error> {
-        write!(f, "a {} b {} c {} d {} e {} f {} g {} h {}",
-               self.a,
-               self.b,
-               self.c,
-               self.d,
-               self.e,
-               self.f,
-               self.g,
-               self.h)
+        write!(
+            f,
+            "a {} b {} c {} d {} e {} f {} g {} h {}",
+            self.a, self.b, self.c, self.d, self.e, self.f, self.g, self.h
+        )
     }
 }
 

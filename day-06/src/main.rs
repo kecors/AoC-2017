@@ -3,20 +3,20 @@ use std::collections::HashMap;
 use std::collections::hash_map::Entry;
 
 struct State {
-    hm: HashMap<Vec<u32>, u32>
+    hm: HashMap<Vec<u32>, u32>,
 }
 
 impl State {
     fn new() -> State {
         State {
-            hm: HashMap::<Vec<u32>, u32>::new()
+            hm: HashMap::<Vec<u32>, u32>::new(),
         }
     }
 
     fn track(&mut self, banks: &[u32], cycle: u32) -> Option<u32> {
         match self.hm.entry((*banks).to_vec()) {
             Entry::Occupied(o) => return Some(*o.get()),
-            Entry::Vacant(v)   => v.insert(cycle)
+            Entry::Vacant(v) => v.insert(cycle),
         };
         None
     }
@@ -73,11 +73,7 @@ fn main() {
     let mut input = String::new();
 
     io::stdin().read_line(&mut input).unwrap();
-    let strs: Vec<&str> = input.trim()
-                               .split_whitespace()
-                               .collect();
-    let banks: Vec<u32> = strs.iter()
-                              .map(|x| x.parse::<u32>().unwrap())
-                              .collect();
+    let strs: Vec<&str> = input.trim().split_whitespace().collect();
+    let banks: Vec<u32> = strs.iter().map(|x| x.parse::<u32>().unwrap()).collect();
     process(banks);
 }

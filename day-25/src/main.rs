@@ -14,7 +14,7 @@ struct BlueprintParser;
 #[derive(Debug, Clone)]
 enum Direction {
     Left,
-    Right
+    Right,
 }
 
 impl Default for Direction {
@@ -57,7 +57,8 @@ impl Machine {
         let mut state_zero_flag: bool = true;
 
         for line in lines {
-            let pairs = BlueprintParser::parse_str(Rule::line, line).unwrap_or_else(|e| panic!("{}", e));
+            let pairs =
+                BlueprintParser::parse_str(Rule::line, line).unwrap_or_else(|e| panic!("{}", e));
 
             for pair in pairs {
                 let rule = pair.as_rule();
@@ -65,40 +66,39 @@ impl Machine {
                 match rule {
                     Rule::begin_state => {
                         self.current_state = text.chars().next().unwrap();
-                    },
+                    }
                     Rule::step_limit => {
                         self.step_limit = text.parse().unwrap();
-                    },
+                    }
                     Rule::state_id => {
                         state.id = text.chars().next().unwrap();
-                    },
+                    }
                     Rule::current_value => {
                         if text == "0" {
                             state_zero_flag = true;
                         } else {
                             state_zero_flag = false;
                         }
-                    },
+                    }
                     Rule::write_value => {
                         if state_zero_flag == true {
                             state.on_zero.write = text.parse().unwrap();
                         } else {
                             state.on_one.write = text.parse().unwrap();
                         }
-                    },
+                    }
                     Rule::move_direction => {
                         let direction = match text.as_str() {
-                            "left"  => Direction::Left,
+                            "left" => Direction::Left,
                             "right" => Direction::Right,
-                            _       => unimplemented!("")
+                            _ => unimplemented!(""),
                         };
                         if state_zero_flag == true {
                             state.on_zero.direction = direction;
                         } else {
                             state.on_one.direction = direction;
                         }
-
-                    },
+                    }
                     Rule::next_state => {
                         let next_state = text.chars().next().unwrap();
                         if state_zero_flag == true {
@@ -108,8 +108,10 @@ impl Machine {
                             self.states.insert(state.id, state);
                             state = State::default();
                         }
-                    },
-                    _ => { unimplemented!("parse"); }
+                    }
+                    _ => {
+                        unimplemented!("parse");
+                    }
                 }
             }
         }
@@ -130,8 +132,10 @@ impl Machine {
                 rules = state.on_one.clone();
             }
         } else {
-            println!("Current state {} unknown, cannot determine rules", 
-                     self.current_state);
+            println!(
+                "Current state {} unknown, cannot determine rules",
+                self.current_state
+            );
             return;
         }
         if rules.write == 0 {
@@ -142,7 +146,7 @@ impl Machine {
         match rules.direction {
             Direction::Left => {
                 self.cursor -= 1;
-            },
+            }
             Direction::Right => {
                 self.cursor += 1;
             }
@@ -171,6 +175,8 @@ fn main() {
     machine.parse(input.lines().collect());
 
     machine.run();
-    println!("part 1: diagnostic checksum = {}", 
-             machine.diagnostic_checksum());
+    println!(
+        "part 1: diagnostic checksum = {}",
+        machine.diagnostic_checksum()
+    );
 }

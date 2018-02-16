@@ -1,12 +1,12 @@
 use std::io::{stdin, Read};
-use std::fmt::{Display, Formatter, Error};
+use std::fmt::{Display, Error, Formatter};
 use std::collections::{HashMap, HashSet};
 use std::collections::hash_map::Entry;
 
 #[derive(Debug, Eq, PartialEq, Hash, Clone, Copy)]
 struct Component {
     port_a: u32,
-    port_b: u32
+    port_b: u32,
 }
 
 impl Display for Component {
@@ -19,7 +19,7 @@ impl Component {
     fn reversed(&self) -> Component {
         Component {
             port_a: self.port_b,
-            port_b: self.port_a
+            port_b: self.port_a,
         }
     }
 }
@@ -28,7 +28,7 @@ impl Component {
 struct Interim {
     link_port: u32,
     bridge: Vec<Component>,
-    used: HashSet<Component>
+    used: HashSet<Component>,
 }
 
 impl Display for Interim {
@@ -63,7 +63,7 @@ struct State {
     port_hm: HashMap<u32, Vec<u32>>,
     maximum_weight: u32,
     longest_bridge_len: usize,
-    longest_bridge_weight: u32
+    longest_bridge_weight: u32,
 }
 
 impl State {
@@ -74,7 +74,7 @@ impl State {
             port_hm: port_hm,
             maximum_weight: 0,
             longest_bridge_len: 0,
-            longest_bridge_weight: 0
+            longest_bridge_weight: 0,
         }
     }
 
@@ -94,7 +94,7 @@ impl State {
                 for tail in tails {
                     let component = Component {
                         port_a: interim.link_port,
-                        port_b: *tail
+                        port_b: *tail,
                     };
                     if interim.used.contains(&component) {
                         continue;
@@ -107,7 +107,7 @@ impl State {
                     let interim = Interim {
                         bridge: bridge,
                         used: used,
-                        link_port: *tail
+                        link_port: *tail,
                     };
                     stack.push(interim);
                     stack_add_flag = true;
@@ -138,7 +138,7 @@ fn make_port_hm(components: &Vec<Component>) -> HashMap<u32, Vec<u32>> {
                 let mut tail_ports = Vec::new();
                 tail_ports.push(component.port_b);
                 vacant.insert(tail_ports);
-            },
+            }
             Entry::Occupied(mut occupied) => {
                 occupied.get_mut().push(component.port_b);
             }
@@ -148,7 +148,7 @@ fn make_port_hm(components: &Vec<Component>) -> HashMap<u32, Vec<u32>> {
                 let mut tail_ports = Vec::new();
                 tail_ports.push(component.port_a);
                 vacant.insert(tail_ports);
-            },
+            }
             Entry::Occupied(mut occupied) => {
                 occupied.get_mut().push(component.port_a);
             }
@@ -161,10 +161,7 @@ fn parse_line(line: &str) -> Component {
     let mut s = line.split('/');
     let port_a: u32 = s.next().unwrap().parse().unwrap();
     let port_b: u32 = s.next().unwrap().parse().unwrap();
-    Component {
-        port_a,
-        port_b
-    }
+    Component { port_a, port_b }
 }
 
 fn main() {
@@ -172,13 +169,13 @@ fn main() {
 
     stdin().read_to_string(&mut input).unwrap();
 
-    let components: Vec<Component> = input.lines()
-                                          .map(|line| parse_line(line))
-                                          .collect();
+    let components: Vec<Component> = input.lines().map(|line| parse_line(line)).collect();
 
     let mut state = State::new(components);
     state.run();
     println!("part 1: maximum weight = {}", state.maximum_weight);
-    println!("part 2: longest bridge weight = {}", 
-             state.longest_bridge_weight);
+    println!(
+        "part 2: longest bridge weight = {}",
+        state.longest_bridge_weight
+    );
 }

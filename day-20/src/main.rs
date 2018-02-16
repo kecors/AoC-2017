@@ -1,5 +1,5 @@
 use std::io::{stdin, Read};
-use std::fmt::{Display, Formatter, Error};
+use std::fmt::{Display, Error, Formatter};
 use std::collections::HashMap;
 use std::collections::hash_map::Entry;
 
@@ -17,14 +17,14 @@ struct ParticleParser;
 struct Coordinates {
     x: i64,
     y: i64,
-    z: i64
+    z: i64,
 }
 
 #[derive(Debug, Default, Clone)]
 struct Particle {
     position: Coordinates,
     velocity: Coordinates,
-    acceleration: Coordinates
+    acceleration: Coordinates,
 }
 
 impl Particle {
@@ -51,24 +51,33 @@ impl Particle {
 
 impl Display for Particle {
     fn fmt(&self, f: &mut Formatter) -> Result<(), Error> {
-        write!(f, "p=<{},{},{}>, v=<{},{},{}>, a=<{},{},{}>",
-               self.position.x, self.position.y, self.position.z,
-               self.velocity.x, self.velocity.y, self.velocity.z,
-               self.acceleration.x, self.acceleration.y, self.acceleration.z)
+        write!(
+            f,
+            "p=<{},{},{}>, v=<{},{},{}>, a=<{},{},{}>",
+            self.position.x,
+            self.position.y,
+            self.position.z,
+            self.velocity.x,
+            self.velocity.y,
+            self.velocity.z,
+            self.acceleration.x,
+            self.acceleration.y,
+            self.acceleration.z
+        )
     }
 }
 
 #[derive(Debug)]
 struct State {
     particles: Vec<Particle>,
-    collision_detector: HashMap<Coordinates, Vec<usize>>
+    collision_detector: HashMap<Coordinates, Vec<usize>>,
 }
 
 impl State {
     fn new(particles: Vec<Particle>) -> State {
         State {
             particles: particles,
-            collision_detector: HashMap::new()
+            collision_detector: HashMap::new(),
         }
     }
 
@@ -83,7 +92,7 @@ impl State {
                     let mut indices = Vec::new();
                     indices.push(index);
                     vacant.insert(indices);
-                },
+                }
                 Entry::Occupied(mut occupied) => {
                     occupied.get_mut().push(index);
                 }
@@ -107,13 +116,10 @@ impl State {
 
     fn closest(&self) {
         let (index, particle) = self.particles
-                                    .iter()
-                                    .enumerate()
-                                    .min_by(|x, y|
-                                        x.1.manhattan_distance()
-                                         .cmp(&y.1.manhattan_distance())
-                                    )
-                                    .unwrap();
+            .iter()
+            .enumerate()
+            .min_by(|x, y| x.1.manhattan_distance().cmp(&y.1.manhattan_distance()))
+            .unwrap();
         println!("[{}] {}", index, particle);
     }
 
@@ -133,32 +139,34 @@ fn parse_line(line: &str) -> Particle {
         match rule {
             Rule::px => {
                 particle.position.x = text.parse().unwrap();
-            },
+            }
             Rule::py => {
                 particle.position.y = text.parse().unwrap();
-            },
+            }
             Rule::pz => {
                 particle.position.z = text.parse().unwrap();
-            },
+            }
             Rule::vx => {
                 particle.velocity.x = text.parse().unwrap();
-            },
+            }
             Rule::vy => {
                 particle.velocity.y = text.parse().unwrap();
-            },
+            }
             Rule::vz => {
                 particle.velocity.z = text.parse().unwrap();
-            },
+            }
             Rule::ax => {
                 particle.acceleration.x = text.parse().unwrap();
-            },
+            }
             Rule::ay => {
                 particle.acceleration.y = text.parse().unwrap();
-            },
+            }
             Rule::az => {
                 particle.acceleration.z = text.parse().unwrap();
-            },
-            _ => { unimplemented!("parse_line"); }
+            }
+            _ => {
+                unimplemented!("parse_line");
+            }
         }
     }
 
@@ -170,9 +178,7 @@ fn main() {
 
     stdin().read_to_string(&mut input).unwrap();
 
-    let particles: Vec<Particle> = input.lines()
-                                        .map(|line| parse_line(line))
-                                        .collect();
+    let particles: Vec<Particle> = input.lines().map(|line| parse_line(line)).collect();
 
     let mut state = State::new(particles);
 
@@ -183,8 +189,11 @@ fn main() {
         state.closest();
         let collided_count = state.tick();
         if collided_count > 0 {
-            println!("---- {} collided particles removed; {} remain", 
-                     collided_count, state.particle_count());
+            println!(
+                "---- {} collided particles removed; {} remain",
+                collided_count,
+                state.particle_count()
+            );
         }
     }
     println!("part 2: particle count = {:?}", state.particle_count());

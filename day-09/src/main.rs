@@ -17,7 +17,7 @@ enum Token {
     GarbageStart,
     GarbageEnd,
     Cancel,
-    Other
+    Other,
 }
 
 #[derive(Debug, Default)]
@@ -26,7 +26,7 @@ struct State {
     garbage: bool,
     depth: u32,
     scores: Vec<u32>,
-    garbage_total: u32
+    garbage_total: u32,
 }
 
 impl State {
@@ -36,12 +36,12 @@ impl State {
             garbage: false,
             depth: 0,
             scores: Vec::new(),
-            garbage_total: 0
+            garbage_total: 0,
         }
     }
 
     fn process(&mut self, token: Token) {
-//        println!("state = {:?}, token = {:?}", self, token);
+        //println!("state = {:?}, token = {:?}", self, token);
         if self.cancel == true {
             self.cancel = false;
             return;
@@ -64,16 +64,15 @@ impl State {
         match token {
             Token::GroupStart => {
                 self.depth += 1;
-            },
+            }
             Token::GroupEnd => {
                 self.scores.push(self.depth);
                 self.depth -= 1;
-            },
+            }
             Token::GarbageStart => {
                 self.garbage = true;
-            },
-            _ => {
             }
+            _ => {}
         }
     }
 
@@ -89,15 +88,15 @@ impl State {
 fn parse_line(stream: &str, state: &mut State) {
     let pairs = StreamParser::parse_str(Rule::stream, stream).unwrap_or_else(|e| panic!("{}", e));
 
-//    println!("pairs = {:?}", pairs);
+    //println!("pairs = {:?}", pairs);
     for pair in pairs {
         state.process(match pair.as_rule() {
-            Rule::groupstart   => Token::GroupStart,
-            Rule::groupend     => Token::GroupEnd,
+            Rule::groupstart => Token::GroupStart,
+            Rule::groupend => Token::GroupEnd,
             Rule::garbagestart => Token::GarbageStart,
-            Rule::garbageend   => Token::GarbageEnd,
-            Rule::cancel       => Token::Cancel,
-            _                  => Token::Other
+            Rule::garbageend => Token::GarbageEnd,
+            Rule::cancel => Token::Cancel,
+            _ => Token::Other,
         });
     }
 }
@@ -106,11 +105,11 @@ fn main() {
     let mut input = String::new();
 
     io::stdin().read_line(&mut input).unwrap();
-//    println!("input = {:?}", input.trim());
+    //println!("input = {:?}", input.trim());
 
     let mut state = State::new();
     parse_line(input.trim(), &mut state);
-//    println!("state = {:?}", state);
+    //println!("state = {:?}", state);
     println!("total score = {}", state.total_score());
     println!("total garbage = {}", state.total_garbage());
 }

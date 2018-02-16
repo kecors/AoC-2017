@@ -7,7 +7,7 @@ pub struct Coprocessor {
     code_segment: Vec<Instruction>,
     instruction_pointer: i64,
     registers: HashMap<char, i64>,
-    mul_count: u32
+    mul_count: u32,
 }
 
 impl Coprocessor {
@@ -21,7 +21,7 @@ impl Coprocessor {
             code_segment: instructions,
             instruction_pointer: 0,
             registers: registers,
-            mul_count: 0
+            mul_count: 0,
         }
     }
 
@@ -46,8 +46,7 @@ impl Coprocessor {
                 }
             }
             match self.code_segment[self.instruction_pointer as usize] {
-                Instruction::NoOp => {
-                },
+                Instruction::NoOp => {}
                 Instruction::SetR(register1, register2) => {
                     let mut new_value = 0;
                     if let Some(value) = self.registers.get(&register2) {
@@ -56,12 +55,12 @@ impl Coprocessor {
                     if let Some(value) = self.registers.get_mut(&register1) {
                         *value = new_value;
                     }
-                },
+                }
                 Instruction::SetN(register, number) => {
                     if let Some(value) = self.registers.get_mut(&register) {
                         *value = number;
                     };
-                },
+                }
                 Instruction::SubR(register1, register2) => {
                     let mut minuend = 0;
                     if let Some(value) = self.registers.get(&register2) {
@@ -70,12 +69,12 @@ impl Coprocessor {
                     if let Some(value) = self.registers.get_mut(&register1) {
                         *value -= minuend;
                     }
-                },
+                }
                 Instruction::SubN(register, number) => {
                     if let Some(value) = self.registers.get_mut(&register) {
                         *value -= number;
                     }
-                },
+                }
                 Instruction::MulR(register1, register2) => {
                     let mut factor = 0;
                     if let Some(value) = self.registers.get(&register2) {
@@ -85,13 +84,13 @@ impl Coprocessor {
                         *value *= factor;
                         self.mul_count += 1;
                     }
-                },
+                }
                 Instruction::MulN(register, number) => {
                     if let Some(value) = self.registers.get_mut(&register) {
                         *value *= number;
                         self.mul_count += 1;
                     }
-                },
+                }
                 Instruction::JnzRR(register1, register2) => {
                     let mut x = 0;
                     if let Some(value) = self.registers.get(&register1) {
@@ -103,7 +102,7 @@ impl Coprocessor {
                             jumped = true;
                         }
                     }
-                },
+                }
                 Instruction::JnzRN(register, number) => {
                     let mut x = 0;
                     if let Some(value) = self.registers.get(&register) {
@@ -113,7 +112,7 @@ impl Coprocessor {
                         self.instruction_pointer += number;
                         jumped = true;
                     }
-                },
+                }
                 Instruction::JnzNR(number, register) => {
                     if let Some(offset) = self.registers.get(&register) {
                         if number != 0 {
@@ -121,7 +120,7 @@ impl Coprocessor {
                             jumped = true;
                         }
                     }
-                },
+                }
                 Instruction::JnzNN(number1, number2) => {
                     if number1 != 0 {
                         self.instruction_pointer += number2;

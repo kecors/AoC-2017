@@ -1,5 +1,5 @@
 use std::io::{stdin, Read};
-use std::fmt::{Display, Formatter, Error};
+use std::fmt::{Display, Error, Formatter};
 use std::collections::{HashMap, HashSet};
 
 #[derive(Debug, Eq, PartialEq, Hash, Clone)]
@@ -42,7 +42,7 @@ impl Grid {
         for x in 0..size {
             outer_vec.push(Vec::new());
             for y in 0..size {
-                outer_vec[x].push(self.0[size-x-1][y]);
+                outer_vec[x].push(self.0[size - x - 1][y]);
             }
         }
         Grid(outer_vec)
@@ -78,10 +78,10 @@ impl Grid {
             subvecs.push(Vec::new());
         }
         let row_chunks = self.0.chunks(chunk_size);
-        for (rc_index,rc_content) in row_chunks.enumerate() {
+        for (rc_index, rc_content) in row_chunks.enumerate() {
             for row in rc_content {
                 let column_chunks = row.chunks(chunk_size);
-                for (cc_index,cc_content) in column_chunks.enumerate() {
+                for (cc_index, cc_content) in column_chunks.enumerate() {
                     let offset = rc_index * chunk_count + cc_index;
                     subvecs[offset].push(cc_content.to_vec());
                 }
@@ -97,13 +97,13 @@ impl Grid {
         let mut result: Vec<Vec<bool>> = Vec::new();
         let length = (squares.len() as f32).sqrt() as usize;
         let size = squares[0].0.len();
-        for _ in 0..length*size {
+        for _ in 0..length * size {
             result.push(Vec::new());
         }
         for x in 0..length {
             for y in 0..length {
                 let index = x * length + y;
-                for (j,subvec) in squares[index].0.iter().enumerate() {
+                for (j, subvec) in squares[index].0.iter().enumerate() {
                     let k = x * size + j;
                     result[k].extend(subvec);
                 }
@@ -142,14 +142,14 @@ impl Display for Grid {
 #[derive(Debug)]
 struct State {
     image: Grid,
-    rules: HashMap<Grid, Grid>
+    rules: HashMap<Grid, Grid>,
 }
 
 impl State {
     fn new(image: &str) -> State {
         State {
             image: Grid::new(image),
-            rules: HashMap::new()
+            rules: HashMap::new(),
         }
     }
 
@@ -181,7 +181,7 @@ impl State {
 
     #[allow(dead_code)]
     fn display_rules(&self) {
-        for (k,v) in self.rules.iter() {
+        for (k, v) in self.rules.iter() {
             print_border("-", v.size());
             print!("{}=>\n{}", k, v);
             print_border("=", v.size());
@@ -215,14 +215,14 @@ fn main() {
         state.add_rule(input_pattern, output_pattern);
     }
 
-//    state.display_image();
+    //    state.display_image();
     for x in 0..18 {
         state.iterate();
-//        state.display_image();
+        //        state.display_image();
         if x == 4 {
             println!("part 1: pixels on = {}", state.pixels_on_count());
         }
-//        println!("x = {}, count = {}", x, state.pixels_on_count());
+        //        println!("x = {}, count = {}", x, state.pixels_on_count());
     }
     println!("part 2: pixels on = {}", state.pixels_on_count());
 }

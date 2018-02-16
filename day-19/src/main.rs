@@ -6,7 +6,7 @@ enum Direction {
     UP,
     DOWN,
     LEFT,
-    RIGHT
+    RIGHT,
 }
 
 #[derive(Debug)]
@@ -16,7 +16,7 @@ struct State {
     column: usize,
     direction: Direction,
     letters: Vec<char>,
-    steps: u32
+    steps: u32,
 }
 
 impl State {
@@ -39,50 +39,58 @@ impl State {
             column: column,
             direction: Direction::DOWN,
             letters: Vec::new(),
-            steps: 0
+            steps: 0,
         }
     }
 
     fn go(&mut self) {
         loop {
             match self.direction {
-                Direction::UP    => { self.row -= 1; },
-                Direction::DOWN  => { self.row += 1; },
-                Direction::LEFT  => { self.column -= 1; },
-                Direction::RIGHT => { self.column += 1; }
+                Direction::UP => {
+                    self.row -= 1;
+                }
+                Direction::DOWN => {
+                    self.row += 1;
+                }
+                Direction::LEFT => {
+                    self.column -= 1;
+                }
+                Direction::RIGHT => {
+                    self.column += 1;
+                }
             }
             self.steps += 1;
             match self.diagram[self.row][self.column] {
                 ' ' => {
-                    println!("part 1: letters = {}", 
-                             String::from_iter(&self.letters));
+                    println!("part 1: letters = {}", String::from_iter(&self.letters));
                     println!("part 2: took {} steps", self.steps);
                     break;
-                },
+                }
                 '+' => {
-                    if self.direction == Direction::UP || 
-                       self.direction == Direction::DOWN {
-                        if self.diagram[self.row][self.column+1] == ' ' {
+                    if self.direction == Direction::UP || self.direction == Direction::DOWN {
+                        if self.diagram[self.row][self.column + 1] == ' ' {
                             self.direction = Direction::LEFT;
                         } else {
                             self.direction = Direction::RIGHT;
                         }
-                    } else if self.direction == Direction::LEFT ||
-                              self.direction == Direction::RIGHT {
-                        if self.diagram[self.row+1][self.column] == ' ' {
+                    } else if self.direction == Direction::LEFT
+                        || self.direction == Direction::RIGHT
+                    {
+                        if self.diagram[self.row + 1][self.column] == ' ' {
                             self.direction = Direction::UP;
                         } else {
                             self.direction = Direction::DOWN;
                         }
                     }
-                    println!("[{:3}, {:3}] turn {:?}", 
-                             self.row, self.column, self.direction);
-                },
+                    println!(
+                        "[{:3}, {:3}] turn {:?}",
+                        self.row, self.column, self.direction
+                    );
+                }
                 c => {
                     if c.is_alphabetic() {
                         self.letters.push(c);
-                        println!("[{:3}, {:3}] add letter {}", 
-                                 self.row, self.column, c);
+                        println!("[{:3}, {:3}] add letter {}", self.row, self.column, c);
                     }
                 }
             }

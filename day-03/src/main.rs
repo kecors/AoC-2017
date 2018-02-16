@@ -17,105 +17,106 @@
 //   marked "Turn the corner" continues this pattern.
 //
 // - The sum for a square can use 2, 3 or 4 previous values, depending on
-//   how soon the spiral will turn. Square::summable_squares() builds a 
-//   list of these adjacent values. Spiral::calculate_sum() searches 
+//   how soon the spiral will turn. Square::summable_squares() builds a
+//   list of these adjacent values. Spiral::calculate_sum() searches
 //   backward through the grid vector, matching on grid position and adding
 //   up the new sum.
 //
 use std::io;
 
-#[derive(Copy)]
-#[derive(Clone)]
-#[derive(PartialEq)]
-#[derive(Debug)]
+#[derive(Copy, Clone, PartialEq, Debug)]
 enum Direction {
     RIGHT,
     UP,
     LEFT,
-    DOWN
+    DOWN,
 }
 
 #[derive(Debug)]
 struct Square {
-    x:         i32,
-    y:         i32,
-    sum:       Option<u32>
+    x: i32,
+    y: i32,
+    sum: Option<u32>,
 }
 
 impl Square {
     fn initial() -> Square {
-        Square { x: 0, y: 0, sum: Some(1) }
+        Square {
+            x: 0,
+            y: 0,
+            sum: Some(1),
+        }
     }
 
     fn create_next(&self, direction: Direction) -> Square {
-        let (x, y) : (i32, i32) = match direction {
-            Direction::RIGHT => {
-                (self.x + 1, self.y    )
-            },
-            Direction::UP => {
-                (self.x    , self.y + 1)
-            },
-            Direction::LEFT => {
-                (self.x - 1, self.y    )
-            },
-            Direction::DOWN => {
-                (self.x    , self.y - 1)
-            },
+        let (x, y): (i32, i32) = match direction {
+            Direction::RIGHT => (self.x + 1, self.y),
+            Direction::UP => (self.x, self.y + 1),
+            Direction::LEFT => (self.x - 1, self.y),
+            Direction::DOWN => (self.x, self.y - 1),
         };
 
-        Square { x: x, y: y, sum: None }
+        Square {
+            x: x,
+            y: y,
+            sum: None,
+        }
     }
 
-    #[cfg(feature="part2")]
-    fn summable_squares(&self, direction: Direction, position: u32) -> Vec<(i32,i32)> {
-        let mut result : Vec<(i32,i32)> = Vec::new();
+    #[cfg(feature = "part2")]
+    fn summable_squares(&self, direction: Direction, position: u32) -> Vec<(i32, i32)> {
+        let mut result: Vec<(i32, i32)> = Vec::new();
 
         match direction {
             Direction::RIGHT => {
-                result.push((self.x - 1, self.y    ));
+                result.push((self.x - 1, self.y));
                 result.push((self.x - 1, self.y + 1));
-            },
+            }
             Direction::UP => {
-                result.push((self.x,     self.y - 1));
+                result.push((self.x, self.y - 1));
                 result.push((self.x - 1, self.y - 1));
-            },
+            }
             Direction::LEFT => {
-                result.push((self.x + 1, self.y    ));
+                result.push((self.x + 1, self.y));
                 result.push((self.x + 1, self.y - 1));
-            },
+            }
             Direction::DOWN => {
-                result.push((self.x,     self.y + 1));
+                result.push((self.x, self.y + 1));
                 result.push((self.x + 1, self.y + 1));
             }
         };
-        if position == 0 { return result; }
+        if position == 0 {
+            return result;
+        }
 
         match direction {
             Direction::RIGHT => {
-                result.push((self.x,     self.y + 1));
-            },
+                result.push((self.x, self.y + 1));
+            }
             Direction::UP => {
-                result.push((self.x - 1, self.y    ));
-            },
+                result.push((self.x - 1, self.y));
+            }
             Direction::LEFT => {
-                result.push((self.x,     self.y - 1));
-            },
+                result.push((self.x, self.y - 1));
+            }
             Direction::DOWN => {
-                result.push((self.x + 1, self.y    ));
+                result.push((self.x + 1, self.y));
             }
         };
-        if position == 1 { return result; }
-        
+        if position == 1 {
+            return result;
+        }
+
         match direction {
             Direction::RIGHT => {
                 result.push((self.x + 1, self.y + 1));
-            },
+            }
             Direction::UP => {
                 result.push((self.x - 1, self.y + 1));
-            },
+            }
             Direction::LEFT => {
                 result.push((self.x - 1, self.y - 1));
-            },
+            }
             Direction::DOWN => {
                 result.push((self.x + 1, self.y - 1));
             }
@@ -129,30 +130,30 @@ impl Square {
 }
 
 struct Spiral {
-    limit:     usize,
-    grid:      Vec<Square>,
+    limit: usize,
+    grid: Vec<Square>,
     direction: Direction,
-    distance:  u32,
-    step:      u32
+    distance: u32,
+    step: u32,
 }
 
 impl Spiral {
     fn new(limit: usize) -> Spiral {
         Spiral {
-            limit:     limit,
-            grid:      Vec::with_capacity(limit),
+            limit: limit,
+            grid: Vec::with_capacity(limit),
             direction: Direction::RIGHT,
-            distance:  1,
-            step:      0
+            distance: 1,
+            step: 0,
         }
     }
 
     fn turn(&mut self) {
         self.direction = match self.direction {
             Direction::RIGHT => Direction::UP,
-            Direction::UP    => Direction::LEFT,
-            Direction::LEFT  => Direction::DOWN,
-            Direction::DOWN  => Direction::RIGHT
+            Direction::UP => Direction::LEFT,
+            Direction::LEFT => Direction::DOWN,
+            Direction::DOWN => Direction::RIGHT,
         }
     }
 
@@ -170,18 +171,19 @@ impl Spiral {
             // Turn the corner
             if self.step == self.distance {
                 self.step = 0;
-                if self.direction == Direction::UP || 
-                   self.direction == Direction::DOWN {
+                if self.direction == Direction::UP || self.direction == Direction::DOWN {
                     self.distance += 1;
                 }
                 self.turn();
-             }
+            }
 
-             if self.grid.len() == self.limit { break; }
+            if self.grid.len() == self.limit {
+                break;
+            }
         }
     }
 
-    #[cfg(feature="part2")]
+    #[cfg(feature = "part2")]
     fn calculate_sum(&self, square: &mut Square) {
         let summable_squares = square.summable_squares(self.direction, self.distance - self.step);
         let mut sum = 0;
@@ -200,13 +202,15 @@ impl Spiral {
         }
     }
 
-    #[cfg(not(feature="part2"))]
-    fn calculate_sum(&self, _square: &mut Square) {
-    }
+    #[cfg(not(feature = "part2"))]
+    fn calculate_sum(&self, _square: &mut Square) {}
 
     fn print_part_1_result(&self) {
-        println!("limit {}: part 1 - steps = {}", 
-                 self.limit, self.grid[self.limit-1].calculate_steps());
+        println!(
+            "limit {}: part 1 - steps = {}",
+            self.limit,
+            self.grid[self.limit - 1].calculate_steps()
+        );
     }
 }
 

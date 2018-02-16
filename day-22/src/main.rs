@@ -6,20 +6,20 @@ enum Direction {
     Up,
     Down,
     Left,
-    Right
+    Right,
 }
 
 #[derive(Debug, Clone)]
 enum Condition {
     Weakened,
     Infected,
-    Flagged
+    Flagged,
 }
 
 #[derive(Debug, Eq, PartialEq, Hash, Clone)]
 struct Position {
     x: i32,
-    y: i32
+    y: i32,
 }
 
 #[derive(Debug)]
@@ -27,7 +27,7 @@ struct State {
     unclean: HashMap<Position, Condition>,
     position: Position,
     direction: Direction,
-    infection: u32
+    infection: u32,
 }
 
 impl State {
@@ -36,7 +36,7 @@ impl State {
             unclean: unclean,
             position: Position { x: 0, y: 0 },
             direction: Direction::Up,
-            infection: 0
+            infection: 0,
         }
     }
 
@@ -45,18 +45,18 @@ impl State {
         let mut insert_infected_flag = false;
         if let Some(_condition) = self.unclean.get(&self.position) {
             self.direction = match self.direction {
-                Direction::Up    => Direction::Right,
+                Direction::Up => Direction::Right,
                 Direction::Right => Direction::Down,
-                Direction::Down  => Direction::Left,
-                Direction::Left  => Direction::Up
+                Direction::Down => Direction::Left,
+                Direction::Left => Direction::Up,
             };
             remove_flag = true;
         } else {
             self.direction = match self.direction {
-                Direction::Up    => Direction::Left,
-                Direction::Left  => Direction::Down,
-                Direction::Down  => Direction::Right,
-                Direction::Right => Direction::Up
+                Direction::Up => Direction::Left,
+                Direction::Left => Direction::Down,
+                Direction::Down => Direction::Right,
+                Direction::Right => Direction::Up,
             };
             insert_infected_flag = true;
             self.infection += 1;
@@ -65,13 +65,22 @@ impl State {
             self.unclean.remove(&self.position);
         }
         if insert_infected_flag {
-            self.unclean.insert(self.position.clone(), Condition::Infected);
+            self.unclean
+                .insert(self.position.clone(), Condition::Infected);
         }
         match self.direction {
-            Direction::Up    => { self.position.y += 1; },
-            Direction::Right => { self.position.x += 1; },
-            Direction::Down  => { self.position.y -= 1; },
-            Direction::Left  => { self.position.x -= 1; }
+            Direction::Up => {
+                self.position.y += 1;
+            }
+            Direction::Right => {
+                self.position.x += 1;
+            }
+            Direction::Down => {
+                self.position.y -= 1;
+            }
+            Direction::Left => {
+                self.position.x -= 1;
+            }
         }
     }
 
@@ -83,32 +92,32 @@ impl State {
                 Condition::Weakened => {
                     *condition = Condition::Infected;
                     self.infection += 1;
-                },
+                }
                 Condition::Infected => {
                     self.direction = match self.direction {
-                        Direction::Up    => Direction::Right,
+                        Direction::Up => Direction::Right,
                         Direction::Right => Direction::Down,
-                        Direction::Down  => Direction::Left,
-                        Direction::Left  => Direction::Up
+                        Direction::Down => Direction::Left,
+                        Direction::Left => Direction::Up,
                     };
                     *condition = Condition::Flagged;
-                },
+                }
                 Condition::Flagged => {
                     self.direction = match self.direction {
-                        Direction::Up    => Direction::Down,
+                        Direction::Up => Direction::Down,
                         Direction::Right => Direction::Left,
-                        Direction::Down  => Direction::Up,
-                        Direction::Left  => Direction::Right
+                        Direction::Down => Direction::Up,
+                        Direction::Left => Direction::Right,
                     };
                     remove_flag = true;
                 }
             }
         } else {
             self.direction = match self.direction {
-                Direction::Up    => Direction::Left,
-                Direction::Left  => Direction::Down,
-                Direction::Down  => Direction::Right,
-                Direction::Right => Direction::Up
+                Direction::Up => Direction::Left,
+                Direction::Left => Direction::Down,
+                Direction::Down => Direction::Right,
+                Direction::Right => Direction::Up,
             };
             insert_weakened_flag = true;
         }
@@ -116,13 +125,22 @@ impl State {
             self.unclean.remove(&self.position);
         }
         if insert_weakened_flag {
-            self.unclean.insert(self.position.clone(), Condition::Weakened);
+            self.unclean
+                .insert(self.position.clone(), Condition::Weakened);
         }
         match self.direction {
-            Direction::Up    => { self.position.y += 1; },
-            Direction::Right => { self.position.x += 1; },
-            Direction::Down  => { self.position.y -= 1; },
-            Direction::Left  => { self.position.x -= 1; }
+            Direction::Up => {
+                self.position.y += 1;
+            }
+            Direction::Right => {
+                self.position.x += 1;
+            }
+            Direction::Down => {
+                self.position.y -= 1;
+            }
+            Direction::Left => {
+                self.position.x -= 1;
+            }
         }
     }
 }

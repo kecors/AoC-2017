@@ -4,7 +4,7 @@ use std::collections::HashMap;
 #[derive(Debug, PartialEq, Clone)]
 enum Direction {
     UP,
-    DOWN
+    DOWN,
 }
 
 #[derive(Debug, Clone)]
@@ -12,16 +12,16 @@ struct Layer {
     depth: u32,
     range: u32,
     scanner: u32,
-    direction: Direction
+    direction: Direction,
 }
 
 impl Layer {
     fn new(depth: u32, range: u32) -> Layer {
         Layer {
-            depth: depth, 
+            depth: depth,
             range: range,
             scanner: 0,
-            direction: Direction::DOWN
+            direction: Direction::DOWN,
         }
     }
 
@@ -29,10 +29,10 @@ impl Layer {
         match self.direction {
             Direction::DOWN => {
                 self.scanner += 1;
-                if self.scanner == self.range-1 {
+                if self.scanner == self.range - 1 {
                     self.direction = Direction::UP;
                 }
-            },
+            }
             Direction::UP => {
                 self.scanner -= 1;
                 if self.scanner == 0 {
@@ -46,7 +46,7 @@ impl Layer {
 #[derive(Debug)]
 struct State {
     layer_hm: HashMap<u32, Layer>,
-    severity: u32
+    severity: u32,
 }
 
 impl State {
@@ -59,7 +59,7 @@ impl State {
 
         State {
             layer_hm: layer_hm,
-            severity: 0
+            severity: 0,
         }
     }
 
@@ -74,7 +74,7 @@ impl State {
     }
 
     fn travel(&mut self) {
-        for depth in 0..self.maximum_depth()+1 {
+        for depth in 0..self.maximum_depth() + 1 {
             let mut severity: u32 = 0;
             if let Some(layer) = self.layer_hm.get(&depth) {
                 if layer.scanner == 0 {
@@ -112,21 +112,21 @@ fn find_minimal_safe_delay(layers: &Vec<Layer>) -> u32 {
 }
 
 fn parse_line(line: &str) -> Layer {
-   let mut values = line.split(": ");
-   let depth: u32 = values.next().unwrap().parse().unwrap();
-   let range: u32 = values.next().unwrap().parse().unwrap();
+    let mut values = line.split(": ");
+    let depth: u32 = values.next().unwrap().parse().unwrap();
+    let range: u32 = values.next().unwrap().parse().unwrap();
 
-   Layer::new(depth, range)
+    Layer::new(depth, range)
 }
 
 fn main() {
     let mut input = String::new();
 
     stdin().read_to_string(&mut input).unwrap();
-//    println!("input = {:#?}", input);
+    //println!("input = {:#?}", input);
 
     let layers: Vec<Layer> = input.lines().map(|line| parse_line(line)).collect();
-//    println!("layers = {:?}", layers);
+    //println!("layers = {:?}", layers);
 
     let mut state = State::new(layers.clone());
     state.travel();

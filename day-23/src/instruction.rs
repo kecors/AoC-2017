@@ -10,5 +10,5 @@ pub enum Instruction {
     JnzRR(char, char),
     JnzRN(char, i64),
     JnzNR(i64, char),
-    JnzNN(i64, i64)
+    JnzNN(i64, i64),
 }

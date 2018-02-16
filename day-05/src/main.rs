@@ -8,7 +8,7 @@
 
 use std::io::{stdin, Read};
 
-#[cfg(feature="part2")]
+#[cfg(feature = "part2")]
 fn modify_instruction(instructions: &mut Vec<i32>, index: usize, instruction: i32) {
     if instruction >= 3 {
         instructions[index] -= 1;
@@ -17,7 +17,7 @@ fn modify_instruction(instructions: &mut Vec<i32>, index: usize, instruction: i3
     }
 }
 
-#[cfg(not(feature="part2"))]
+#[cfg(not(feature = "part2"))]
 fn modify_instruction(instructions: &mut Vec<i32>, index: usize, _instruction: i32) {
     instructions[index] += 1;
 }
@@ -52,7 +52,10 @@ fn main() {
 
     stdin().read_to_string(&mut input).unwrap();
 
-    let mut instructions: Vec<i32> = input.lines().map(|line| line.parse::<i32>().unwrap()).collect();
+    let mut instructions: Vec<i32> = input
+        .lines()
+        .map(|line| line.parse::<i32>().unwrap())
+        .collect();
 
     let steps: u32 = jump_through_maze(&mut instructions);
     println!("steps = {}", steps);

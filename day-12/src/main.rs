@@ -15,12 +15,12 @@ struct LinkingParser;
 #[derive(Debug, Default)]
 struct Linking {
     id: u32,
-    piped: Vec<u32>
+    piped: Vec<u32>,
 }
 
 #[derive(Debug, Default)]
 struct State {
-    pipes: HashMap<u32, Vec<u32>>
+    pipes: HashMap<u32, Vec<u32>>,
 }
 
 impl State {
@@ -30,8 +30,12 @@ impl State {
 
     fn add_pipes(&mut self, id: u32, piped: Vec<u32>) {
         match self.pipes.entry(id) {
-            Entry::Vacant(vacant) => { vacant.insert(piped); },
-            Entry::Occupied(_)    => { println!("occupied unexpectedly"); }
+            Entry::Vacant(vacant) => {
+                vacant.insert(piped);
+            }
+            Entry::Occupied(_) => {
+                println!("occupied unexpectedly");
+            }
         }
     }
 
@@ -43,7 +47,9 @@ impl State {
 
         loop {
             match stack.pop() {
-                None     => { break; },
+                None => {
+                    break;
+                }
                 Some(id) => {
                     if let Some(piped) = self.pipes.get(&id) {
                         for pid in piped {
@@ -67,7 +73,9 @@ impl State {
 
         loop {
             match stack.pop() {
-                None     => { break; },
+                None => {
+                    break;
+                }
                 Some(id) => {
                     if let Some(piped) = self.pipes.get(&id) {
                         stack.extend(piped);
@@ -105,9 +113,15 @@ fn parse_line(line: &str) -> Linking {
         let rule = pair.as_rule();
         let text = pair.clone().into_span().as_str().to_string();
         match rule {
-            Rule::id    => { linking.id = text.parse().unwrap(); },
-            Rule::piped => { linking.piped.push(text.parse().unwrap()); },
-            _           => { println!("unknown rule {:?}", rule); }
+            Rule::id => {
+                linking.id = text.parse().unwrap();
+            }
+            Rule::piped => {
+                linking.piped.push(text.parse().unwrap());
+            }
+            _ => {
+                println!("unknown rule {:?}", rule);
+            }
         }
     }
 
@@ -119,16 +133,14 @@ fn main() {
 
     stdin().read_to_string(&mut input).unwrap();
 
-    let linkings: Vec<Linking> = input.lines()
-                                      .map(|line| parse_line(line))
-                                      .collect();
-//    println!("linkings = {:?}", linkings);
+    let linkings: Vec<Linking> = input.lines().map(|line| parse_line(line)).collect();
+    //println!("linkings = {:?}", linkings);
 
     let mut state = State::new();
     for linking in linkings {
         state.add_pipes(linking.id, linking.piped);
     }
-//    println!("state = {:?}", state);
+    //println!("state = {:?}", state);
     println!("programs connected to {} = {}", 0, state.count_connected(0));
 
     println!("group count = {}", state.count_groups());

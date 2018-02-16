@@ -1,5 +1,5 @@
 use std::io::{stdin, Read};
-use std::collections::{HashSet, HashMap};
+use std::collections::{HashMap, HashSet};
 use std::collections::hash_map::Entry;
 
 extern crate pest;
@@ -17,21 +17,21 @@ struct Program {
     name: String,
     weight: u32,
     disc: Vec<String>,
-    disc_weight: Option<u32>
+    disc_weight: Option<u32>,
 }
 
 impl Program {
     fn total_weight(&self) -> u32 {
         self.weight + match self.disc_weight {
             Some(w) => w,
-            None    => 0
+            None => 0,
         }
     }
 }
 
 struct Tower {
     bottom: String,
-    programs_hm: HashMap<String, Program>
+    programs_hm: HashMap<String, Program>,
 }
 
 impl Tower {
@@ -45,7 +45,7 @@ impl Tower {
 
         Tower {
             bottom: bottom,
-            programs_hm: programs_hm
+            programs_hm: programs_hm,
         }
     }
 
@@ -62,7 +62,11 @@ impl Tower {
             }
         }
 
-        programs_hs.difference(&subprograms_hs).last().unwrap().clone()
+        programs_hs
+            .difference(&subprograms_hs)
+            .last()
+            .unwrap()
+            .clone()
     }
 
     fn calculate_disc_weights(&mut self) {
@@ -145,9 +149,12 @@ impl Tower {
             for _ in 0..depth {
                 program.name.insert(0, '-');
             }
-            print!("{:12} ({:6}) [{:6}]", program.name, 
-                                          program.weight, 
-                                          program.disc_weight.unwrap());
+            print!(
+                "{:12} ({:6}) [{:6}]",
+                program.name,
+                program.weight,
+                program.disc_weight.unwrap()
+            );
 
             for subprogram in program.disc.clone() {
                 print!(" {}", subprogram);
@@ -156,7 +163,7 @@ impl Tower {
 
             program.disc.reverse();
             for subprogram in program.disc {
-                stack.push((subprogram, depth+1));
+                stack.push((subprogram, depth + 1));
             }
         }
     }
@@ -186,11 +193,11 @@ impl Tower {
             for subprogram in program.disc {
                 if let Some(p) = self.programs_hm.get(&subprogram) {
                     match weights_hm.entry(p.total_weight()) {
-                        Entry::Vacant(vacant)   => { 
+                        Entry::Vacant(vacant) => {
                             let mut subprograms = Vec::new();
                             subprograms.push(p.name.clone());
-                            vacant.insert(subprograms); 
-                        },
+                            vacant.insert(subprograms);
+                        }
                         Entry::Occupied(mut occupied) => {
                             occupied.get_mut().push(p.name.clone());
                         }
@@ -199,15 +206,14 @@ impl Tower {
             }
             println!("{} -> {:?}", name, weights_hm);
             if weights_hm.len() == 1 {
-                for (k,v) in weights_hm {
+                for (k, v) in weights_hm {
                     let standard = standards.pop().unwrap();
                     let result = standard - (k * v.len() as u32);
-                    println!("result: {} - ({} * {}) = {}",
-                        standard, k, v.len(), result);
+                    println!("result: {} - ({} * {}) = {}", standard, k, v.len(), result);
                 }
                 break;
             }
-            for (k,v) in weights_hm {
+            for (k, v) in weights_hm {
                 if v.len() == 1 {
                     stack.push(v[0].clone());
                 } else {
@@ -227,10 +233,18 @@ fn parse_line(line: &str) -> Program {
         let rule = pair.as_rule();
         let text = pair.clone().into_span().as_str().to_string();
         match rule {
-            Rule::name       => { program.name = text; },
-            Rule::weight     => { program.weight = text.parse().unwrap(); },
-            Rule::subprogram => { program.disc.push(text); },
-            _                => { println!("unknown rule {:?}", rule); }
+            Rule::name => {
+                program.name = text;
+            }
+            Rule::weight => {
+                program.weight = text.parse().unwrap();
+            }
+            Rule::subprogram => {
+                program.disc.push(text);
+            }
+            _ => {
+                println!("unknown rule {:?}", rule);
+            }
         }
     }
 
@@ -242,9 +256,7 @@ fn main() {
 
     stdin().read_to_string(&mut input).unwrap();
 
-    let programs: Vec<Program> = input.lines()
-                                      .map(|line| parse_line(line))
-                                      .collect();
+    let programs: Vec<Program> = input.lines().map(|line| parse_line(line)).collect();
 
     let mut tower = Tower::new(programs);
     tower.calculate_disc_weights();

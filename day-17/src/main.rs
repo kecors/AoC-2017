@@ -2,7 +2,7 @@
 struct Spinlock {
     buffer: Vec<u64>,
     position: usize,
-    steps: usize
+    steps: usize,
 }
 
 impl Spinlock {
@@ -15,7 +15,7 @@ impl Spinlock {
         Spinlock {
             buffer,
             position,
-            steps
+            steps,
         }
     }
 
@@ -26,7 +26,7 @@ impl Spinlock {
 
     //
     // Customized function for part 2: since we only care about
-    // values at position 1, we can push other values onto the end. 
+    // values at position 1, we can push other values onto the end.
     // For Vec, push() is much faster than insert().
     //
     fn insert_or_push(&mut self, value: u64) {
@@ -48,7 +48,7 @@ fn do_part1() {
 
     for index in 0..spinlock.buffer.len() {
         if spinlock.buffer[index] == 2017 {
-            println!("part 1: {}", spinlock.buffer[index+1]);
+            println!("part 1: {}", spinlock.buffer[index + 1]);
             break;
         }
     }
@@ -63,7 +63,7 @@ fn do_part2() {
 
     for index in 0..spinlock.buffer.len() {
         if spinlock.buffer[index] == 0 {
-            println!("part 2: {}", spinlock.buffer[index+1]);
+            println!("part 2: {}", spinlock.buffer[index + 1]);
             break;
         }
     }
